@@ -73,13 +73,13 @@ const ScannerPage = () => {
       aspect: [4, 3],
       quality: 1,
       // base64:true
-    
+
     });
 
     console.log(result);
 
     if (!result.canceled) {
-    // await   decodeQRCode(result?.assets[0]?.uri);
+      // await   decodeQRCode(result?.assets[0]?.uri);
 
       return setImage(result?.assets[0]?.uri);
 
@@ -91,22 +91,44 @@ const ScannerPage = () => {
     debounce((value: number) => setZoom(value), 100), // Adjust debounce delay if needed
     []
   );
+
+  //   const decodeQRCode = async (imageUri: string) => {
+  //     console.log("object ", imageUri);
+  //     var qr = new QrcodeDecoder();
+
+  //       // let {result}  =await QrImageReader.decode({path:imageUri})
+
+  //       // console.log("qwertyui", imageUri)
+  //       // console.log("data ", result);
+  //     await  qr.decodeFromImage(imageUri).then((res) => {
+  //         console.log("res", res);
+  //       }).catch((err)=>{
+  // console.log("err", err)
+  //       });
+
+  //   };
+// Define a handler function that processes the scan result
+const handleBarcodeScanned = ({ type, data,raw, bounds,cornerPoints}: BarcodeScanningResult) => {
+  if (data) {
+    // You can create the BarcodeScanningResult object here
+    // const barcodeResult: BarcodeScanningResult = {
+    //   type,      // the barcode type (e.g., 'QR_CODE', 'EAN_13')
+    //   data,      // the scanned data (e.g., 'https://example.com')
+    //   raw ,
+    //   bounds,
+    //   cornerPoints
+    // };
+
+    // Handle the barcode scanning result with a delay (optional)
+    setTimeout(() => {
+      // scanHandler(barcodeResult); // Pass the result to the scan handler function
+      console.log("QR code", data);
   
-//   const decodeQRCode = async (imageUri: string) => {
-//     console.log("object ", imageUri);
-//     var qr = new QrcodeDecoder();
-    
-//       // let {result}  =await QrImageReader.decode({path:imageUri})
-      
-//       // console.log("qwertyui", imageUri)
-//       // console.log("data ", result);
-//     await  qr.decodeFromImage(imageUri).then((res) => {
-//         console.log("res", res);
-//       }).catch((err)=>{
-// console.log("err", err)
-//       });
-  
-//   };
+    }, 500);
+
+  }
+};
+
 
   console.log(image)
   return (
@@ -131,23 +153,27 @@ const ScannerPage = () => {
             height: '100%',
             top: 14
           }}
+          // onBarcodeScanned={({ data }) => {
+
+          //   if (data) {
+          //     // qrLock.current = true;
+          //     setTimeout(async () => {
+          //       scanHandler(data)
+          //       // await Linking.openURL(data);
+
+          //     }, 500);
+          //     console.log("qr code", data);
+          //   }
+          // }}
           facing={switchCamera}
           flash='on'
           enableTorch={flashMode}
           // autofocus='on'
           zoom={zoom}
-          onBarcodeScanned={({ data }) => {
-            if (data) {
-              // qrLock.current = true;
-              setTimeout(async () => {
-                await Linking.openURL(data);
-              }, 500);
-              console.log("qr code", data);
-            }
-          }}
+          onBarcodeScanned={handleBarcodeScanned}
         />
 
-        
+
 
         <QrBody
           width="90%" // Matches CameraView width
@@ -160,15 +186,10 @@ const ScannerPage = () => {
           }}
 
         />
-  {
-    image ?
 
-    <Image source={{ uri: image }} style={{ width: 200, height: 200, position: 'absolute' }}
-    resizeMode='cover' />
-  
-  : <View>
-    <Text style={{ fontSize: 20, color: 'white' }}>Scan QR code</Text>
-     </View> }
+
+        <Image source={{ uri: image }} style={{ width: 200, height: 200, position: 'absolute' }}
+          resizeMode='cover' />
 
 
 
