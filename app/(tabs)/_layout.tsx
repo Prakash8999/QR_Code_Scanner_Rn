@@ -15,7 +15,7 @@ export default function TabLayout() {
             title: 'Generate',
             // tabbar
             tabBarLabelStyle: {
-              fontSize:15
+              fontSize: 15
             },
             headerShown: false,
             tabBarIcon: ({ color }) => <Icon size={28} name="qrcode" color={color} />,
@@ -29,9 +29,9 @@ export default function TabLayout() {
             headerShown: false,
             tabBarLabel: "Scan",
             tabBarLabelStyle: {
-              fontSize:15
+              fontSize: 15
             },
-            tabBarIcon: ({ color, focused  }) => (
+            tabBarIcon: ({ color, focused }) => (
               <View style={styles.middleTab}>
                 <View style={[styles.iconWrapper]}>
                   <QrCodeLogo />
@@ -45,12 +45,28 @@ export default function TabLayout() {
           options={{
             title: 'History',
             tabBarLabelStyle: {
-              fontSize:15,
+              fontSize: 15,
             },
             headerShown: false,
             tabBarIcon: ({ color }) => <History size={28} name="history" color={color} />,
           }}
         />
+
+        <Tabs.Screen
+          name="setting-page"
+          options={{
+            href: null
+          }}
+        />
+
+        <Tabs.Screen
+          name="result-page"
+          options={{
+            headerShown:false,
+            href: null
+          }}
+        />
+
       </Tabs>
     </SafeAreaView>
   );
@@ -74,7 +90,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     shadowOffset: {
       width: 0,
-      height:1.0,
+      height: 1.0,
     },
     // shadowColor: 'white',
 
@@ -98,5 +114,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#ffcc00',
   },
-  
+
 });
