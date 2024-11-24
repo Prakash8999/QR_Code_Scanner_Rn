@@ -19,7 +19,8 @@ import { useCodeScanner } from 'react-native-vision-camera';
 import jsQR from 'jsqr';
 import useQRStore from '@/hooks/ZSDataStore';
 import { router } from 'expo-router';
-import { parseQRCodeData } from '@/helpers/RefractorQrData';
+import { parseQRCodeData, QRCodeDetails } from '@/helpers/RefractorQrData';
+import { saveQRCodeWithId } from '@/hooks/SaveDataLocally';
 const debounce = (func: Function, delay: number) => {
   let timeoutId: ReturnType<typeof setTimeout>;
   return (...args: any[]) => {
@@ -33,7 +34,7 @@ const ScannerPage = () => {
   const [image, setImage] = useState<string | null>('');
   const [scale, setScale] = React.useState(1);
   const [translate, setTranslate] = React.useState({ x: 0, y: 0 });
-  
+
   const addData = useQRStore((state) => state.setQRData)
 
   const [permission, requestPermission] = useCameraPermissions();
@@ -111,6 +112,7 @@ const ScannerPage = () => {
   //       });
 
   //   };
+  
 
 
 
@@ -121,24 +123,25 @@ const ScannerPage = () => {
       const barcodeResult: BarcodeScanningResult = {
         type,      // the barcode type (e.g., 'QR_CODE', 'EAN_13')
         data,      // the scanned data (e.g., 'https://example.com')
-        raw ,
+        raw,
         bounds,
         cornerPoints
       };
-console.log("raw ", raw)
+      console.log("raw ", raw)
       // Handle the barcode scanning result with a delay (optional)
-      setTimeout(() => {
+      setTimeout( () => {
         // scanHandler(barcodeResult); // Pass the result to the scan handler function
         console.log("QR code", cornerPoints);
-        router.push('/(tabs)/result-page' as any)
         const parsedData = parseQRCodeData(barcodeResult.raw!);
-        console.log("parsedData ", parsedData)
+        console.log("parsedData",typeof parsedData);
         addData(JSON.stringify(parsedData))
+        router.replace('/(tabs)/result-page')
         
       }, 100);
 
     }
   };
+
 
 
   console.log(image)
@@ -180,7 +183,7 @@ console.log("raw ", raw)
           flash='on'
           enableTorch={flashMode}
           // autofocus='on'
-          
+
           zoom={zoom}
           onBarcodeScanned={handleBarcodeScanned}
         />

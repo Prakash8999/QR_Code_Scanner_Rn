@@ -210,5 +210,5 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
   }
 
   // If the QR code is not recognized, treat it as a generic text or unknown type
-  return { type: "Unknown", details: { rawData: data } };
+  return { type: "Unknown", details: { data: data } };
 };
