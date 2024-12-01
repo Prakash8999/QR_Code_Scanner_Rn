@@ -8,6 +8,7 @@
 export interface QRCodeDetails {
   type: string; // The type of the QR code (e.g., "WiFi", "vCard", "URL", etc.)
   details: Record<string, any>; // The parsed data (e.g., WiFi SSID, URL, etc.)
+  timestamp?: string;
 }
 
 interface WiFiDetails {
@@ -120,6 +121,7 @@ interface URLDetails {
 export const parseQRCodeData = (rawData: string): QRCodeDetails => {
   // Trim whitespace for safety
   const data = rawData.trim();
+  
 
   // Handle WiFi QR Code
   if (data.startsWith("WIFI:")) {
@@ -161,7 +163,14 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
         }
       });
     }
-    return { type: "WiFi", details: wifiDetails };
+    return { type: "WiFi", details: wifiDetails, timestamp:new Intl.DateTimeFormat('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    }).format(new Date()) };
   }
 
   // Handle vCard QR Code
@@ -186,29 +195,71 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
         vCardDetails.url = line.split(":")[1] || "Unknown";
       }
     });
-    return { type: "vCard", details: vCardDetails };
+    return { type: "vCard", details: vCardDetails, timestamp:new Intl.DateTimeFormat('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    }).format(new Date()) };
   }
 
   // Handle URL QR Code
   if (data.startsWith("http://") || data.startsWith("https://")) {
-    return { type: "URL", details: { url: data } };
+    return { type: "URL", details: { url: data }, timestamp:new Intl.DateTimeFormat('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    }).format(new Date()) };
   }
 
   // Handle Aztec QR Code (just a simple placeholder for now)
   if (data.startsWith("AZTEC:")) {
-    return { type: "Aztec", details: { data } };
+    return { type: "Aztec", details: { data },timestamp:new Intl.DateTimeFormat('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    }).format(new Date()) };
   }
 
   // Handle DataMatrix QR Code (just a simple placeholder for now)
   if (data.startsWith("DATAMATRIX:")) {
-    return { type: "DataMatrix", details: { data } };
+    return { type: "DataMatrix", details: { data }, timestamp:new Intl.DateTimeFormat('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    }).format(new Date()) };
   }
 
   // Handle Codebar QR Code (just a simple placeholder for now)
   if (data.startsWith("CODEBAR:")) {
-    return { type: "Codebar", details: { data } };
+    return { type: "Codebar", details: { data },timestamp:new Intl.DateTimeFormat('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    }).format(new Date()) };
   }
 
   // If the QR code is not recognized, treat it as a generic text or unknown type
-  return { type: "Unknown", details: { data: data } };
+  return { type: "Unknown", details: { data: data }, timestamp:new Intl.DateTimeFormat('en-US', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+  }).format(new Date()) };
 };

@@ -9,7 +9,14 @@ export const saveQRCodeWithId = async (qrCodeDetails: QRCodeDetails) => {
 		const newId = lastId ? parseInt(lastId) + 1 : 1;
 
 		// Add the new ID to the QR code details
-		const newQRCode = { id: newId, ...qrCodeDetails };
+		const newQRCode = { id: newId, ...qrCodeDetails, timestamp:new Intl.DateTimeFormat('en-US', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+          }).format(new Date()) };
 
 		// Get existing history
 		const existingHistory = await AsyncStorage.getItem('qrHistory');
@@ -42,3 +49,15 @@ export const getQRCodeHistory = async (): Promise<(QRCodeDetails & { id: number 
 export const clearAsyncStorage = async () => {
 	await AsyncStorage.clear();
 }
+export const deleteQRCode = async (id: number): Promise<(QRCodeDetails & { id: number })[]> => {
+	try {
+	  const history = await getQRCodeHistory();
+	  const updatedHistory = history.filter((item) => item.id !== id);
+	  await AsyncStorage.setItem('qrHistory', JSON.stringify(updatedHistory));
+	  return updatedHistory;
+	} catch (error) {
+	  console.error('Error deleting QR Code:', error);
+	  return [];
+	}
+  };
+  
