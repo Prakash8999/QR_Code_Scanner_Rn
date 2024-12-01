@@ -20,7 +20,7 @@ import jsQR from 'jsqr';
 import useQRStore from '@/hooks/ZSDataStore';
 import { router } from 'expo-router';
 import { parseQRCodeData, QRCodeDetails } from '@/helpers/RefractorQrData';
-import { saveQRCodeWithId } from '@/hooks/SaveDataLocally';
+import {  saveQRCodeWithId } from '@/hooks/SaveDataLocally';
 const debounce = (func: Function, delay: number) => {
   let timeoutId: ReturnType<typeof setTimeout>;
   return (...args: any[]) => {
@@ -40,7 +40,7 @@ const ScannerPage = () => {
   const [permission, requestPermission] = useCameraPermissions();
   const [switchCamera, setSwitchCamera] = useState<CameraType>('back')
   const qrLock = useRef(false);
-
+  const [isScanning, setIsScanning] = useState(false); 
   const appState = useRef(AppState.currentState);
   const increaseZoom = () => {
     setZoom((prevZoom) => Math.min(prevZoom + 0.1, 1)); // Ensure zoom does not exceed 1
@@ -117,10 +117,14 @@ const ScannerPage = () => {
 
 
   // Define a handler function that processes the scan result
-  const handleBarcodeScanned = ({ type, data, raw, bounds, cornerPoints }: BarcodeScanningResult) => {
+  const handleBarcodeScanned =async ({ type, data, raw, bounds, cornerPoints }: BarcodeScanningResult) => {
+    if ( isScanning) return;
     if (data) {
+      setIsScanning(true); // Lock scanning
+
       // You can create the BarcodeScanningResult object here
       const barcodeResult: BarcodeScanningResult = {
+        
         type,      // the barcode type (e.g., 'QR_CODE', 'EAN_13')
         data,      // the scanned data (e.g., 'https://example.com')
         raw,
@@ -129,15 +133,22 @@ const ScannerPage = () => {
       };
       console.log("raw ", raw)
       // Handle the barcode scanning result with a delay (optional)
+      // scanHandler(barcodeResult); // Pass the result to the scan handler function
+      console.log("QR code", cornerPoints);
+      const parsedData = parseQRCodeData(barcodeResult.raw!);
+      console.log("parsedData",typeof parsedData);
+      addData(JSON.stringify(parsedData))
+      router.push('/(tabs)/result-page')
+      console.log("complete data" )
+      
+      await saveQRCodeWithId(parsedData );
+
+      
       setTimeout( () => {
-        // scanHandler(barcodeResult); // Pass the result to the scan handler function
-        console.log("QR code", cornerPoints);
-        const parsedData = parseQRCodeData(barcodeResult.raw!);
-        console.log("parsedData",typeof parsedData);
-        addData(JSON.stringify(parsedData))
-        router.replace('/(tabs)/result-page')
+        setIsScanning(false); // Unlock scanning after handling
+
         
-      }, 100);
+      }, 200);
 
     }
   };
@@ -181,6 +192,7 @@ const ScannerPage = () => {
           // }}
           facing={switchCamera}
           flash='on'
+        
           enableTorch={flashMode}
           // autofocus='on'
 
