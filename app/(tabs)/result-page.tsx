@@ -11,39 +11,23 @@ import OpenLink from 'react-native-vector-icons/FontAwesome'
 import ShareData from 'react-native-vector-icons/Feather'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveQRCodeWithId } from '@/hooks/SaveDataLocally';
-import { useNavigationState } from '@react-navigation/native';
+import { useNavigationState, useIsFocused } from '@react-navigation/native';
 
 
 const ResultPage = () => {
 	const getQrData = useQRStore.getState().qrData;
-
 	const data: QRCodeDetails = JSON.parse(getQrData?.code!);
 	const [dataText, setDataText] = useState('')
 
+	console.log("type data", typeof data)
+	console.log("type getQrData", typeof getQrData)
 	type OpenURLButtonProps = {
 		url: string;
 		// children: string;
 	};
+	// const isFocused = useIsFocused();
 
-	const saveData = async () => {
 
-		await saveQRCodeWithId(data);
-	}
-	const navigation = useNavigation()
-	const state = useNavigationState((state) => state);
-	// const prevRoute =state.history?.[state.index - 2] || "None"; // Get the previous route
-	// console.log("state.history ", state.routeNames)
-	// console.log("pr" , prevRoute)  
-	// const prevRouteRef = useRef<string | null>(null);
-
-	const routes = navigation.getState()?.routes;
-const prevRoute = routes[routes.length - 4].name;
-const currentRoute = routes[routes.length - 1].name;
-console.log("prrr", currentRoute)
-if (prevRoute === "scanner-page" && currentRoute === "result-page") {
-	saveData()
-}
-	
 	const OpenURLButton = ({ url }: OpenURLButtonProps) => {
 		const handlePress = useCallback(async () => {
 			// Checking if the link is supported for links with custom URL scheme.
@@ -71,7 +55,7 @@ if (prevRoute === "scanner-page" && currentRoute === "result-page") {
 	const copyToClipboard = (text: string) => {
 		Clipboard.setStringAsync(text);
 		ToastAndroid.showWithGravity(
-			'All Your Base Are Belong To Us',
+			'Text Copied Successfully`',
 			100, // Duration (e.g., SHORT, LONG)
 			ToastAndroid.TOP // Position (TOP, CENTER, or BOTTOM)
 		);
@@ -137,7 +121,7 @@ if (prevRoute === "scanner-page" && currentRoute === "result-page") {
 					<QrSvg width="45" height="45" />
 					<View>
 						<Text className="font-PoppinsRegular text-xl text-white">Data</Text>
-						<Text className="font-PoppinsThin text-sm text-white">{getQrData?.timestamp}</Text>
+						<Text className="font-PoppinsThin text-sm text-white">{data.timestamp}</Text>
 					</View>
 				</View>
 				<View

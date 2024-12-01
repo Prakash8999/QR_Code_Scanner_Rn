@@ -1,16 +1,27 @@
 import { QrCodeLogo } from '@/assets/images/SvgImage';
 import { Tabs } from 'expo-router';
-import { Platform, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import History from 'react-native-vector-icons/MaterialIcons';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+const Stack = createNativeStackNavigator();
 
 export default function TabLayout() {
+
   return (
     <SafeAreaView style={styles.safearea} >
-      <Tabs screenOptions={{ tabBarActiveTintColor: '#ffcc00', tabBarStyle: styles.tabBar }}>
+    {/* <NavigationContainer> */}
+    {/* <KeyboardAvoidingView
+        // style={styles.container}
+        behavior='position'
+        keyboardVerticalOffset={60} // Adjust this value based on your tab bar height
+      > */}
+
+      <Tabs screenOptions={{ tabBarActiveTintColor: '#ffcc00', tabBarStyle: styles.tabBar }} >
         <Tabs.Screen
           name="generate-page"
-
+          
           options={{
             title: 'Generate',
             // tabbar
@@ -20,11 +31,11 @@ export default function TabLayout() {
             headerShown: false,
             tabBarIcon: ({ color }) => <Icon size={28} name="qrcode" color={color} />,
           }}
-        />
+          />
         <Tabs.Screen
           name="scanner-page"
           options={{
-
+            
             // tabBarShowLabel:false,
             headerShown: false,
             tabBarLabel: "Scan",
@@ -50,14 +61,14 @@ export default function TabLayout() {
             headerShown: false,
             tabBarIcon: ({ color }) => <History size={28} name="history" color={color} />,
           }}
-        />
+          />
 
         <Tabs.Screen
           name="setting-page"
           options={{
             href: null
           }}
-        />
+          />
 
         <Tabs.Screen
           name="result-page"
@@ -65,9 +76,18 @@ export default function TabLayout() {
             headerShown:false,
             href: null
           }}
-        />
+          />
+        <Tabs.Screen
+          name="qrform-page"
+          options={{
+            headerShown:false,
+            href: null
+          }}
+          />
 
       </Tabs>
+          {/* </KeyboardAvoidingView> */}
+          {/* </NavigationContainer> */}
     </SafeAreaView>
   );
 }
@@ -77,7 +97,11 @@ const styles = StyleSheet.create({
     flex: 1,
     // paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
+  container: {
+    flex: 1,
+  },
   tabBar: {
+    
     backgroundColor: '#333333',
     height: 60,
     borderBottomWidth: 0,
