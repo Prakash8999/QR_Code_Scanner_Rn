@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, Pressable, ScrollView, FlatList } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import useQRStore from '@/hooks/ZSDataStore'
+import {useQRStore} from '@/hooks/ZSDataStore'
 import { clearAsyncStorage, deleteQRCode, getQRCodeHistory } from '@/hooks/SaveDataLocally'
 import { QRCodeDetails } from '@/helpers/RefractorQrData'
 import { useIsFocused } from '@react-navigation/native'

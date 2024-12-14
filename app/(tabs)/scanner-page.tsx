@@ -1,12 +1,8 @@
 import { View, TouchableOpacity, Linking, AppState, Platform, StatusBar, Pressable, StyleSheet, Text, Image, Alert } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Shadow } from 'react-native-shadow-2';
 import Flash from 'react-native-vector-icons/Fontisto';
 import FolderIcon from 'react-native-vector-icons/Ionicons';
 import * as FileSystem from 'expo-file-system';
-import QrcodeDecoder from 'qrcode-decoder';
-
-import QrImageReader from 'react-native-qr-image-reader';
 
 import { PanGestureHandler, PinchGestureHandler } from 'react-native-gesture-handler';
 import { CameraType, CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
@@ -15,9 +11,8 @@ import Slider from '@react-native-community/slider';
 import PlusMinus from 'react-native-vector-icons/AntDesign';
 import * as ImagePicker from 'expo-image-picker';
 import ScannerOverlay from '@/components/SelectImage';
-import { useCodeScanner } from 'react-native-vision-camera';
-import jsQR from 'jsqr';
-import useQRStore from '@/hooks/ZSDataStore';
+
+import {useQRStore} from '@/hooks/ZSDataStore';
 import { router } from 'expo-router';
 import { parseQRCodeData, QRCodeDetails } from '@/helpers/RefractorQrData';
 import {  saveQRCodeWithId } from '@/hooks/SaveDataLocally';
@@ -120,11 +115,8 @@ const ScannerPage = () => {
   const handleBarcodeScanned =async ({ type, data, raw, bounds, cornerPoints }: BarcodeScanningResult) => {
     if ( isScanning) return;
     if (data) {
-      setIsScanning(true); // Lock scanning
-
-      // You can create the BarcodeScanningResult object here
+      setIsScanning(true); 
       const barcodeResult: BarcodeScanningResult = {
-        
         type,      // the barcode type (e.g., 'QR_CODE', 'EAN_13')
         data,      // the scanned data (e.g., 'https://example.com')
         raw,
@@ -132,18 +124,10 @@ const ScannerPage = () => {
         cornerPoints
       };
       console.log("raw ", raw)
-      // Handle the barcode scanning result with a delay (optional)
-      // scanHandler(barcodeResult); // Pass the result to the scan handler function
-      console.log("QR code", cornerPoints);
       const parsedData = parseQRCodeData(barcodeResult.raw!);
-      console.log("parsedData",typeof parsedData);
       addData(JSON.stringify(parsedData))
       router.push('/(tabs)/result-page')
-      console.log("complete data" )
-      
       await saveQRCodeWithId(parsedData );
-
-      
       setTimeout( () => {
         setIsScanning(false); // Unlock scanning after handling
 

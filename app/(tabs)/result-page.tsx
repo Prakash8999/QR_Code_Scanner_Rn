@@ -3,71 +3,26 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import GoBackIcon from 'react-native-vector-icons/Ionicons';
 import { Link, Navigator, useNavigation } from 'expo-router';
 import { QrSvg } from '@/assets/images/SvgImage';
-import useQRStore from '@/hooks/ZSDataStore';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { useQRStore } from '@/hooks/ZSDataStore';
 import { QRCodeDetails } from '@/helpers/RefractorQrData';
-import * as Clipboard from 'expo-clipboard';
 import Copy from 'react-native-vector-icons/MaterialIcons'
-import OpenLink from 'react-native-vector-icons/FontAwesome'
 import ShareData from 'react-native-vector-icons/Feather'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveQRCodeWithId } from '@/hooks/SaveDataLocally';
 import { useNavigationState, useIsFocused } from '@react-navigation/native';
+import { copyToClipboard, OpenURLButton, shareText } from '@/components/ReUsableCompo';
 
 
 const ResultPage = () => {
 	const getQrData = useQRStore.getState().qrData;
 	const data: QRCodeDetails = JSON.parse(getQrData?.code!);
-	const [dataText, setDataText] = useState('')
-
-	console.log("type data", typeof data)
-	console.log("type getQrData", typeof getQrData)
-	type OpenURLButtonProps = {
-		url: string;
-		// children: string;
-	};
-	// const isFocused = useIsFocused();
 
 
-	const OpenURLButton = ({ url }: OpenURLButtonProps) => {
-		const handlePress = useCallback(async () => {
-			// Checking if the link is supported for links with custom URL scheme.
-			const supported = await Linking.canOpenURL(url);
-
-			if (supported) {
-				// Opening the link with some app, if the URL scheme is "http" the web link should be opened
-				// by some browser in the mobile
-				await Linking.openURL(url);
-			} else {
-				Alert.alert(`Don't know how to open this URL: ${url}`);
-			}
-		}, [url]);
-
-		return <TouchableOpacity onPress={handlePress} className='flex flex-col justify-center items-center'>
-			<OpenLink name='external-link' size={30} color={'white'} />
-			<Text className='text-white font-PoppinsRegular'>
-				Open Url
-			</Text>
-		</TouchableOpacity>;
-	}
+	console.log("data ", data)
 
 
 
-	const copyToClipboard = (text: string) => {
-		Clipboard.setStringAsync(text);
-		ToastAndroid.showWithGravity(
-			'Text Copied Successfully`',
-			100, // Duration (e.g., SHORT, LONG)
-			ToastAndroid.TOP // Position (TOP, CENTER, or BOTTOM)
-		);
-	};
-
-	const shareText = async (text: string) => {
-		try {
-			await Share.share({ message: text });
-		} catch (err) {
-			console.log(err);
-		}
-	}
 	const renderData = (forCopy = false): string | JSX.Element => {
 		if (data.type === 'WiFi') {
 			const { ssid, securityType, password, hidden } = data.details;
@@ -82,27 +37,127 @@ const ResultPage = () => {
 					</>
 				);
 		} else if (data.type === 'vCard') {
-			const { fullName, mobile, homePhone, email, url } = data.details;
+			const { fullName, mobile, homePhone, email, url, company, job, city, address } = data.details;
 			return forCopy
-				? `Full Name: ${fullName}\nMobile: ${mobile}\nHome Phone: ${homePhone}\nEmail: ${email}\nURL: ${url}`
+				? `Full Name: ${fullName}\nMobile: ${mobile}\nHome Phone: ${homePhone || ''}\nEmail: ${email}\nURL: ${url}\nCompany: ${company || ''}\nJob: ${job || ''}\nCity: ${city || ''}\nAddress: ${address || ''}`
 				: (
 					<>
 						<Text className="text-white text-base" selectable={true}>Full Name: {fullName + '\n'}</Text>
 						<Text className="text-white text-base" selectable={true}>Mobile: {mobile + '\n'}</Text>
-						<Text className="text-white text-base" selectable={true}>Home Phone: {homePhone + '\n'}</Text>
+						{
+							homePhone && <Text className={`text-white text-base `} selectable={true}>Home Phone: {homePhone + '\n'}</Text>
+						}
+
+
 						<Text className="text-white text-base" selectable={true}>Email: {email + '\n'}</Text>
-						<Text className="text-white text-base" selectable={true}>URL: {url + '\n'}</Text>
+						{
+							company && <Text className="text-white text-base" selectable={true}>Company: {company + '\n'}</Text>
+
+						}
+						{
+							job && <Text className="text-white text-base" selectable={true}>Job: {job + '\n'}</Text>
+						}
+						{
+							city && <Text className="text-white text-base" selectable={true}>City: {city + '\n'}</Text>
+						}
+						{
+							address && <Text className="text-white text-base" selectable={true}>Address: {address + '\n'}</Text>
+						}
+						{
+							url && <Text className="text-white text-base" selectable={true}>URL: {url} </Text>
+						}
+						{/* <Text className="text-white text-base" selectable={true}>Website: {url + '\n'}</Text> */}
+
 					</>
 				);
-		} else if (data.type === 'URL') {
+		} else if (data.type === 'Url') {
 			return forCopy ? `URL: ${data.details.url}` : (
-				<Text className="text-white text-base" selectable={true}>URL: {data.details.url}</Text>
+				<Text className="text-white text-base" selectable={true}>Url: {data.details.url}</Text>
 			);
-		} else {
+
+
+		}
+		else if (data.type === 'geo') {
+			const {latitude, longitude,query } = data.details;
+			return forCopy
+				? `Latitude: ${latitude}\nLongitude: ${longitude}\Query: ${query || ''}`
+				: (
+					<>
+						<Text className="text-white text-base" selectable={true}>Latitude: {latitude + '\n'}</Text>
+						<Text className="text-white text-base" selectable={true}>Longitude: {longitude + '\n'}</Text>
+						{
+							query && <Text className={`text-white text-base `} selectable={true}>Query: {query }</Text>
+						}
+
+
+
+					</>
+				);
+		}
+		else if (data.type === 'Text') {
+			return forCopy ? `Text: ${data.details.text}` : (
+				<Text className="text-white text-base" selectable={true}>Text: {data.details.text}</Text>
+			);
+		}
+
+		else if (data.type === 'Telephone') {
+			return forCopy ? `Phone: ${data.details.telephone}` : (
+				<Text className="text-white text-base" selectable={true}>Telephone: {data.details.telephone.tel ? data.details.telephone.tel : data.details.telephone}</Text>
+			);
+		}
+		else if (data.type === 'Whatsapp') {
+			return forCopy ? `WhatsApp: ${data.details.whatsapp}` : (
+				<Text className="text-white text-base" selectable={true}>WhatsApp: {data.details.whatsapp}</Text>
+			);
+		}
+		else if (data.type === 'Email') {
+			return forCopy ? `WhatsApp: ${data.details.email}` : (
+				<Text className="text-white text-base" selectable={true}>Email: {data.details.email}</Text>
+			);
+		}
+
+		else if (data.type === 'Event') {
+			const { description, endDateTime, eventLocation, eventName, startDateTime } = data.details;
+			return forCopy
+				? `Event Name: ${eventName}\nStart Date & Time: ${startDateTime}\nEnd Date & Time: ${endDateTime}\nEvent Location: ${eventLocation}\Description: ${description}`
+				: (
+					<>
+						<Text className="text-white text-base" selectable={true}>Event Name: {eventName + '\n'}</Text>
+						<Text className="text-white text-base" selectable={true}>Start Date & Time: {startDateTime + '\n'}</Text>
+						<Text className="text-white text-base" selectable={true}>End Date & Time: {endDateTime + '\n'}</Text>
+						<Text className="text-white text-base" selectable={true}>Event Location: {eventLocation + '\n'}</Text>
+						<Text className="text-white text-base" selectable={true}>Description: {description + '\n'}</Text>
+					</>
+				);
+		}
+		else if (data.type === 'bCard') {
+			const { country, city, address, email, website, companyName, phone, industry } = data.details;
+			return forCopy
+				? `Company Name: ${companyName}\nPhone: ${phone}\nEmail: ${email}\nURL: ${website}\nIndustry: ${industry || ''}\nAddress: ${address || ''}\nCity: ${city || ''}n\Country: ${country || ''}`
+				: (
+					<>
+						<Text className="text-white text-base" selectable={true}>Company Name: {companyName + '\n'}</Text>
+						<Text className="text-white text-base" selectable={true}>Industry: {industry + '\n'}</Text>
+						<Text className="text-white text-base" selectable={true}>Phone No: {phone + '\n'}</Text>
+						<Text className="text-white text-base" selectable={true}>Email: {email + '\n'}</Text>
+						<Text className="text-white text-base" selectable={true}>Website: {website} </Text>
+						<Text className="text-white text-base" selectable={true}>Address: {address + '\n'}</Text>
+						<Text className="text-white text-base" selectable={true}>City: {city + '\n'}</Text>
+
+						<Text className="text-white text-base" selectable={true}>Country: {country + '\n'}</Text>
+
+
+					</>
+				);
+		}
+		else {
 			return forCopy ? `Data: ${data.details.data}` : (
 				<Text className="text-white text-base" selectable={true}>{data.details.data}</Text>
 			);
 		}
+
+
+
 	};
 
 
@@ -142,22 +197,40 @@ const ResultPage = () => {
 				</ScrollView>
 			</View>
 			<View className='top-20 p-6 w-[80%]  h-fit  mx-auto flex flex-row justify-between'>
-				{data.type === 'URL' ? (
+				{data.type === 'Url' ? (
 
-					<OpenURLButton url={data.details.url} />
+					<OpenURLButton url={data.details.url.toLowerCase()} text='Open Url' iconName='external-link' />
 				) : null}
 
 				<TouchableOpacity onPress={() => copyToClipboard(renderData(true) as string)} className='  text-center flex items-center'>
-					<Copy name='content-copy' color={'white'} size={30} className='text-center ' />
+					<Copy name='content-copy' color={'white'} size={30} />
 					<Text className='text-center text-white font-PoppinsRegular'>
 						Copy
 					</Text>
 				</TouchableOpacity>
-				<TouchableOpacity onPress={() => shareText(renderData(true) as string)}>
-					<ShareData name='share' color={'white'} size={30} className='text-center' />
+
+				{
+					data.type === 'Whatsapp' ? (
+						<OpenURLButton url={`https://api.whatsapp.com/send/?phone=%2B91${data.details.whatsapp}&text&type=phone_number&app_absent=0`} text='Open' iconName='whatsapp' />
+
+
+					) : null
+				}
+				{
+					data.type === 'Email' ? (
+						<OpenURLButton url={`mailto:${data.details.email}`} text='Open' iconName='Email' />
+
+
+					) : null
+				}
+
+				<TouchableOpacity onPress={() => shareText(renderData(true) as string)} className='  text-center flex items-center'>
+					<ShareData name='share' color={'white'} size={30} />
 					<Text className='text-center text-white font-PoppinsRegular'>
 						Share
 					</Text>
+
+
 				</TouchableOpacity>
 
 

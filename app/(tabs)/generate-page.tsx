@@ -13,9 +13,9 @@ import { useNavigation, useRouter } from 'expo-router';
 const iconsData = [
 	{ id: 1, name: 'format-text', type: 'Text', size: 30, color: 'white', showName: "Text" },
 	{ id: 2, name: 'www', type: 'Www', size: 30, color: 'white', showName: "Url" },
-	{ id: 3, name: 'wifi', type: 'Feather', size: 30, color: 'white', showName: "Wi-Fi" },
+	{ id: 3, name: 'wifi', type: 'Feather', size: 30, color: 'white', showName: "WiFi" },
 	{ id: 4, name: 'event-available', type: 'MaterialIcons', size: 30, color: 'white', showName: "Event" },
-	{ id: 5, name: 'perm-contact-cal', type: 'MaterialIcons', size: 30, color: 'white', showName: "Contact" },
+	{ id: 5, name: 'perm-contact-cal', type: 'MaterialIcons', size: 30, color: 'white', showName: "vCard" },
 	{ id: 6, name: 'business', type: 'MaterialIcons', size: 30, color: 'white', showName: "Business" },
 	{ id: 7, name: 'location-on', type: 'MaterialIcons', size: 30, color: 'white', showName: "Location" },
 	{ id: 8, name: 'whatsapp', type: 'FontAwesome', size: 30, color: 'white', showName: "Whatsapp" },

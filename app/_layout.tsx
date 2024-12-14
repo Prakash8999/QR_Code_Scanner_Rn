@@ -25,6 +25,7 @@ export default function RootLayout() {
     'Poppins-Thin': require('../assets/fonts/Poppins-Thin.ttf')
   });
 
+
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
