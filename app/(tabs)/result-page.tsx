@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking, Alert, ToastAndroid, Share } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking, Alert, ToastAndroid, Share, Dimensions } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import GoBackIcon from 'react-native-vector-icons/Ionicons';
 import { Link, Navigator, useNavigation } from 'expo-router';
@@ -12,18 +12,66 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveQRCodeWithId } from '@/hooks/SaveDataLocally';
 import { useNavigationState, useIsFocused } from '@react-navigation/native';
 import { copyToClipboard, OpenURLButton, shareText } from '@/components/ReUsableCompo';
+import QRCode from 'react-native-qrcode-svg';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
+import { captureRef } from 'react-native-view-shot';
 
+const { width } = Dimensions.get('window');
 
 const ResultPage = () => {
-	const getQrData = useQRStore.getState().qrData;
-	const data: QRCodeDetails = JSON.parse(getQrData?.code!);
+	const qrData = useQRStore((state) => state.qrData);
+	const qrRef = useRef<any>(null);
+	const viewShotRef = useRef<any>(null);
 
+	if (!qrData) {
+		return (
+			<View className="bg-[rgb(51,51,51)]/[0.85] h-full w-full flex items-center justify-center">
+				<Text className="text-white text-xl">No QR Code Data Found</Text>
+				<Link href="/(tabs)/scanner-page" asChild>
+					<TouchableOpacity className="mt-4 bg-[#FDB623] px-4 py-2 rounded-lg">
+						<Text className="text-black font-PoppinsMedium">Go Back</Text>
+					</TouchableOpacity>
+				</Link>
+			</View>
+		);
+	}
+
+	let data: QRCodeDetails;
+	try {
+		data = JSON.parse(qrData.code);
+	} catch (error) {
+		console.error("Failed to parse QR data:", error);
+		return (
+			<View className="bg-[rgb(51,51,51)]/[0.85] h-full w-full flex items-center justify-center">
+				<Text className="text-white text-xl">Invalid QR Code Data</Text>
+			</View>
+		);
+	}
 
 	console.log("data ", data)
 
+	const shareQrImage = async () => {
+		if (!viewShotRef.current) return;
 
+		try {
+			const uri = await captureRef(viewShotRef, {
+				format: "png",
+				quality: 1,
+			});
 
-	const renderData = (forCopy = false): string | JSX.Element => {
+			if (await Sharing.isAvailableAsync()) {
+				await Sharing.shareAsync(uri);
+			} else {
+				Alert.alert('Error', 'Sharing is not available on this device');
+			}
+		} catch (error) {
+			console.error('Error sharing QR Code:', error);
+			Alert.alert('Error', 'Failed to share QR Code');
+		}
+	};
+
+	const renderData = (forCopy = false): string | React.ReactNode => {
 		if (data.type === 'WiFi') {
 			const { ssid, securityType, password, hidden } = data.details;
 			return forCopy
@@ -66,7 +114,6 @@ const ResultPage = () => {
 						{
 							url && <Text className="text-white text-base" selectable={true}>URL: {url} </Text>
 						}
-						{/* <Text className="text-white text-base" selectable={true}>Website: {url + '\n'}</Text> */}
 
 					</>
 				);
@@ -78,19 +125,16 @@ const ResultPage = () => {
 
 		}
 		else if (data.type === 'geo') {
-			const {latitude, longitude,query } = data.details;
+			const { latitude, longitude, query } = data.details;
 			return forCopy
-				? `Latitude: ${latitude}\nLongitude: ${longitude}\Query: ${query || ''}`
+				? `Latitude: ${latitude}\nLongitude: ${longitude}\nQuery: ${query || ''}`
 				: (
 					<>
 						<Text className="text-white text-base" selectable={true}>Latitude: {latitude + '\n'}</Text>
 						<Text className="text-white text-base" selectable={true}>Longitude: {longitude + '\n'}</Text>
 						{
-							query && <Text className={`text-white text-base `} selectable={true}>Query: {query }</Text>
+							query && <Text className={`text-white text-base `} selectable={true}>Query: {query}</Text>
 						}
-
-
-
 					</>
 				);
 		}
@@ -111,7 +155,7 @@ const ResultPage = () => {
 			);
 		}
 		else if (data.type === 'Email') {
-			return forCopy ? `WhatsApp: ${data.details.email}` : (
+			return forCopy ? `Email: ${data.details.email}` : (
 				<Text className="text-white text-base" selectable={true}>Email: {data.details.email}</Text>
 			);
 		}
@@ -119,7 +163,7 @@ const ResultPage = () => {
 		else if (data.type === 'Event') {
 			const { description, endDateTime, eventLocation, eventName, startDateTime } = data.details;
 			return forCopy
-				? `Event Name: ${eventName}\nStart Date & Time: ${startDateTime}\nEnd Date & Time: ${endDateTime}\nEvent Location: ${eventLocation}\Description: ${description}`
+				? `Event Name: ${eventName}\nStart Date & Time: ${startDateTime}\nEnd Date & Time: ${endDateTime}\nEvent Location: ${eventLocation}\nDescription: ${description}`
 				: (
 					<>
 						<Text className="text-white text-base" selectable={true}>Event Name: {eventName + '\n'}</Text>
@@ -133,7 +177,7 @@ const ResultPage = () => {
 		else if (data.type === 'bCard') {
 			const { country, city, address, email, website, companyName, phone, industry } = data.details;
 			return forCopy
-				? `Company Name: ${companyName}\nPhone: ${phone}\nEmail: ${email}\nURL: ${website}\nIndustry: ${industry || ''}\nAddress: ${address || ''}\nCity: ${city || ''}n\Country: ${country || ''}`
+				? `Company Name: ${companyName}\nPhone: ${phone}\nEmail: ${email}\nURL: ${website}\nIndustry: ${industry || ''}\nAddress: ${address || ''}\nCity: ${city || ''}\nCountry: ${country || ''}`
 				: (
 					<>
 						<Text className="text-white text-base" selectable={true}>Company Name: {companyName + '\n'}</Text>
@@ -145,8 +189,6 @@ const ResultPage = () => {
 						<Text className="text-white text-base" selectable={true}>City: {city + '\n'}</Text>
 
 						<Text className="text-white text-base" selectable={true}>Country: {country + '\n'}</Text>
-
-
 					</>
 				);
 		}
@@ -155,9 +197,6 @@ const ResultPage = () => {
 				<Text className="text-white text-base" selectable={true}>{data.details.data}</Text>
 			);
 		}
-
-
-
 	};
 
 
@@ -171,7 +210,7 @@ const ResultPage = () => {
 				<Text className="text-white text-2xl font-PoppinsMedium tracking-wider">Result</Text>
 			</View>
 
-			<View className="w-[80%] min-h-[25%] h-fit max-h-[60%] overflow-hidden bg-[#333333] mx-auto top-16 rounded-lg elevation-2xl p-6 flex gap-y-5">
+			<View className="w-[85%] min-h-[30%] h-fit max-h-[60%] overflow-hidden bg-[#333333] mx-auto top-16 rounded-lg elevation-2xl p-6 flex gap-y-5">
 				<View className="flex flex-row gap-x-6">
 					<QrSvg width="45" height="45" />
 					<View>
@@ -182,21 +221,32 @@ const ResultPage = () => {
 				<View
 					style={{
 						borderBottomColor: 'white',
-						opacity: 50,
+						opacity: 0.5,
 						borderBottomWidth: StyleSheet.hairlineWidth,
 					}}
 				/>
-				<ScrollView>
-					<View className="flex gap-y-2 ">
-						<Text selectable={true}>
-
-							{renderData()}
-						</Text>
-
+				<ScrollView showsVerticalScrollIndicator={false}>
+					<View className="flex items-center justify-center py-4">
+						{data.qrContent && (
+							<View 
+								ref={viewShotRef} 
+								style={{ padding: 25, backgroundColor: 'white', borderRadius: 30, elevation: 5 }}
+								className="items-center justify-center shadow-lg"
+							>
+								<QRCode
+									value={data.qrContent}
+									size={width * 0.5}
+									getRef={(c) => (qrRef.current = c)}
+								/>
+							</View>
+						)}
+					</View>
+					<View className="flex gap-y-2 mt-4">
+						{renderData()}
 					</View>
 				</ScrollView>
 			</View>
-			<View className='top-20 p-6 w-[80%]  h-fit  mx-auto flex flex-row justify-between'>
+			<View className='top-20 p-6 w-[90%]  h-fit  mx-auto flex flex-row justify-between'>
 				{data.type === 'Url' ? (
 
 					<OpenURLButton url={data.details.url.toLowerCase()} text='Open Url' iconName='external-link' />
@@ -224,10 +274,17 @@ const ResultPage = () => {
 					) : null
 				}
 
+				<TouchableOpacity onPress={shareQrImage} className='  text-center flex items-center'>
+					<ShareData name='image' color={'white'} size={30} />
+					<Text className='text-center text-white font-PoppinsRegular'>
+						Share QR
+					</Text>
+				</TouchableOpacity>
+
 				<TouchableOpacity onPress={() => shareText(renderData(true) as string)} className='  text-center flex items-center'>
 					<ShareData name='share' color={'white'} size={30} />
 					<Text className='text-center text-white font-PoppinsRegular'>
-						Share
+						Share Text
 					</Text>
 
 

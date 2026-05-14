@@ -183,7 +183,7 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
       });
     }
     return {
-      type: "WiFi", details: wifiDetails, timestamp: new Intl.DateTimeFormat('en-US', {
+      type: "WiFi", details: wifiDetails, qrContent: data, timestamp: new Intl.DateTimeFormat('en-US', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -217,7 +217,7 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
       }
     });
     return {
-      type: "vCard", details: vCardDetails, timestamp: new Intl.DateTimeFormat('en-US', {
+      type: "vCard", details: vCardDetails, qrContent: data, timestamp: new Intl.DateTimeFormat('en-US', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -231,7 +231,7 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
   // Handle URL QR Code
   if (data.startsWith("http://") || data.startsWith("https://")) {
     return {
-      type: "Url", details: { url: data }, timestamp: new Intl.DateTimeFormat('en-US', {
+      type: "Url", details: { url: data }, qrContent: data, timestamp: new Intl.DateTimeFormat('en-US', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -244,7 +244,7 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
 
   if (data.startsWith('tel') || data.startsWith('telephone')) {
     return {
-      type: "Telephone", details: { telephone: data }, timestamp: new Intl.DateTimeFormat('en-US', {
+      type: "Telephone", details: { telephone: data }, qrContent: data, timestamp: new Intl.DateTimeFormat('en-US', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -256,9 +256,21 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
   }
 
 
-  if (data.startsWith('geo')) {
+  if (data.startsWith('geo:')) {
+    const geoParts = data.slice(4).split('?');
+    const coords = geoParts[0].split(',');
+    const latitude = coords[0] || '0';
+    const longitude = coords[1] || '0';
+    let query = '';
+    if (geoParts[1] && geoParts[1].startsWith('q=')) {
+      query = decodeURIComponent(geoParts[1].slice(2));
+    }
+
     return {
-      type: "geo", details: Geolocation, timestamp: new Intl.DateTimeFormat('en-US', {
+      type: "geo",
+      details: { latitude, longitude, query },
+      qrContent: data,
+      timestamp: new Intl.DateTimeFormat('en-US', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -272,6 +284,7 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
     return {
       type: "Text",
       details: { text: data },
+      qrContent: data,
       timestamp: new Intl.DateTimeFormat('en-US', {
         day: '2-digit',
         month: 'short',
@@ -286,7 +299,7 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
   // Handle Aztec QR Code (just a simple placeholder for now)
   if (data.startsWith("AZTEC:")) {
     return {
-      type: "Aztec", details: { data }, timestamp: new Intl.DateTimeFormat('en-US', {
+      type: "Aztec", details: { data }, qrContent: data, timestamp: new Intl.DateTimeFormat('en-US', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -300,7 +313,7 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
   // Handle DataMatrix QR Code (just a simple placeholder for now)
   if (data.startsWith("DATAMATRIX:")) {
     return {
-      type: "DataMatrix", details: { data }, timestamp: new Intl.DateTimeFormat('en-US', {
+      type: "DataMatrix", details: { data }, qrContent: data, timestamp: new Intl.DateTimeFormat('en-US', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -314,7 +327,7 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
   // Handle Codebar QR Code (just a simple placeholder for now)
   if (data.startsWith("CODEBAR:")) {
     return {
-      type: "Codebar", details: { data }, timestamp: new Intl.DateTimeFormat('en-US', {
+      type: "Codebar", details: { data }, qrContent: data, timestamp: new Intl.DateTimeFormat('en-US', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -327,7 +340,7 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
 
   // If the QR code is not recognized, treat it as a generic text or unknown type
   return {
-    type: "Unknown", details: { data: data }, timestamp: new Intl.DateTimeFormat('en-US', {
+    type: "Unknown", details: { data: data }, qrContent: data, timestamp: new Intl.DateTimeFormat('en-US', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',

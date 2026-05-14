@@ -15,7 +15,7 @@ const GenerateResultPage = () => {
 
 
 
-	const renderData = (forCopy = false): string | JSX.Element => {
+	const renderData = (forCopy = false): string | React.ReactNode => {
 		if (data.type === 'WiFi') {
 			const { ssid, securityType, password, hidden } = data.details;
 			return forCopy

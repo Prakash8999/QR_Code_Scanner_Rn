@@ -2,7 +2,7 @@ import { View, TouchableOpacity, Linking, AppState, Platform, StatusBar, Pressab
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Flash from 'react-native-vector-icons/Fontisto';
 import FolderIcon from 'react-native-vector-icons/Ionicons';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 import { PanGestureHandler, PinchGestureHandler } from 'react-native-gesture-handler';
 import { CameraType, CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';

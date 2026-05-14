@@ -2,8 +2,10 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
-import { SafeAreaView, StyleSheet, Platform, StatusBar, View, ActivityIndicator, Image } from 'react-native';
+import { StyleSheet, Platform, View, ActivityIndicator, Image } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -48,22 +50,21 @@ export default function RootLayout() {
   }
 
   return (
-    
-      <Stack>
-        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-
+    <SafeAreaProvider>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#333333' }} edges={['top', 'bottom', 'left', 'right']}>
+        <StatusBar style="light" />
+        <Stack>
+          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
 
 const style = StyleSheet.create({
-  safearea: {
-    flex: 1,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
   loadingContainer: {
     flex: 1,
     backgroundColor: '#333333',

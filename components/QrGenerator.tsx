@@ -23,13 +23,10 @@ import { Picker } from '@react-native-picker/picker';
 
 
 
-interface QRCodeWithToDataURL extends QRCode {
-	toDataURL: (callback: (data: string) => void) => void;
-}
 
 interface SingleInputQrProps {
 	className: string,
-	type: String,
+	type: string,
 	placeholder: string,
 	logo: string,
 	label: string
@@ -47,9 +44,9 @@ export const SingleInputQrGenerator: React.FC<SingleInputQrProps> = ({ className
 	let qrContent;
 	if (type === 'Twitter') qrContent = `https://x.com/${inputValue}`
 	else if (type === 'Instagram') qrContent = `https://www.instagram.com/${inputValue}/`
-	else if (type === 'EMAIL') qrContent = `mailto:${inputValue}`
+	else if (type === 'Email') qrContent = `mailto:${inputValue}`
 	else if (type === 'Telephone') qrContent = `tel:${inputValue}`
-	else if (type === 'WhatsApp') qrContent = `https://wa.me/${inputValue}`
+	else if (type === 'Whatsapp') qrContent = `https://wa.me/${inputValue}`
 	else qrContent = inputValue
 
 
@@ -974,7 +971,7 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 				))} */}
 				</View>
 				<TouchableOpacity className="bg-[#FDB623] rounded-md px-2 py-3" onPress={handleSaveQRCode}>
-					<Text className="text-xl font-PoppinsMedium">Generate Contact QR</Text>
+					<Text className="text-xl font-PoppinsMedium">Generate Business QR</Text>
 				</TouchableOpacity>
 			</View>
 		</View>

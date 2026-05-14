@@ -1,6 +1,6 @@
 import { QrCodeLogo } from '@/assets/images/SvgImage';
 import { Tabs } from 'expo-router';
-import { KeyboardAvoidingView, Platform, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, StatusBar, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import History from 'react-native-vector-icons/MaterialIcons';
 import {NavigationContainer} from '@react-navigation/native';
@@ -10,7 +10,7 @@ const Stack = createNativeStackNavigator();
 export default function TabLayout() {
 
   return (
-    <SafeAreaView style={styles.safearea} >
+    <View style={styles.safearea} >
     {/* <NavigationContainer> */}
     {/* <KeyboardAvoidingView
         // style={styles.container}
@@ -95,14 +95,13 @@ export default function TabLayout() {
       </Tabs>
           {/* </KeyboardAvoidingView> */}
           {/* </NavigationContainer> */}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   safearea: {
     flex: 1,
-    // paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   container: {
     flex: 1,
