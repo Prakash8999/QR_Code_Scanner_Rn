@@ -72,13 +72,13 @@ console.log("type of", typeof history)
 				<View className='bg-[#333333]  rounded-lg h-16 px-2  flex flex-row justify-between items-center ' >
 					<TouchableOpacity onPressIn={() => setIsFocused(1)} className={`w-[45%] h-[80%] flex  justify-center rounded-lg  ${isFocused === 1 ? 'bg-[#FDB623]' : null}`} activeOpacity={1} >
 						<Text className='text-center text-white text-xl font-PoppinsMedium'>
-							Scan
+							Scanned
 						</Text>
 
 					</TouchableOpacity>
 					<Pressable className={`w-[45%] h-[80%] flex  justify-center rounded-lg  ${isFocused === 2 ? 'bg-[#FDB623]' : null}`} onPressIn={() => setIsFocused(2)} >
 						<Text className='text-center text-xl text-white font-PoppinsMedium'>
-							Create
+							Created
 						</Text>
 					</Pressable>
 				</View>
@@ -86,7 +86,7 @@ console.log("type of", typeof history)
 				<FlatList
 					className='mt-6 h-[65%] '
 					
-					data={history}
+					data={history.filter((item) => isFocused === 1 ? !item.generated : item.generated)}
 					keyExtractor={(item) => item.id.toString()}
 					renderItem={({ item }) => (
 						<View className='  px-2 py-1 flex gap-y-5'>

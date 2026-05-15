@@ -13,18 +13,30 @@ type OpenURLButtonProps = {
 // const isFocused = useIsFocused();
 
 
-export const OpenURLButton = ({ url , text, iconName}: OpenURLButtonProps) => {
+export const OpenURLButton = ({ url, text, iconName }: OpenURLButtonProps) => {
 	const handlePress = useCallback(async () => {
-		// Checking if the link is supported for links with custom URL scheme.
-		const supported = await Linking.canOpenURL(url);
-console.log("supported ", supported);
-		if (supported) {
-			// Opening the link with some app, if the URL scheme is "http" the web link should be opened
-			// by some browser in the mobile
-			await Linking.openURL(url);
-		} else {
-			console.log("error while opening url");
-			Alert.alert(`Don't know how to open this URL: ${url}`);
+		let finalUrl = url;
+
+		// Add protocol if missing for web URLs (identified by external-link icon or starting with www.)
+		if (!/^([a-z0-9+.-]+):/i.test(url)) {
+			finalUrl = `https://${url}`;
+		}
+
+		// Checking if the link is supported
+		try {
+			const supported = await Linking.canOpenURL(finalUrl);
+			console.log("URL:", finalUrl, "Supported:", supported);
+
+			if (supported) {
+				await Linking.openURL(finalUrl);
+			} else {
+				// On some devices/OS versions canOpenURL returns false even for valid URLs.
+				// We attempt to open it anyway as a fallback.
+				await Linking.openURL(finalUrl);
+			}
+		} catch (error) {
+			console.log("error while opening url", error);
+			Alert.alert(`Don't know how to open this URL: ${finalUrl}`);
 		}
 	}, [url]);
 

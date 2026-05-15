@@ -8,7 +8,7 @@ import ZocialIcon from 'react-native-vector-icons/Zocial';
 import { TwitterSvg } from '@/assets/images/SvgImage';
 import Foundation from 'react-native-vector-icons/Foundation';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 const iconsData = [
 	{ id: 1, name: 'format-text', type: 'Text', size: 30, color: 'white', showName: "Text" },
@@ -52,62 +52,51 @@ const GenerateQrCode = () => {
 	const router = useRouter()
 	return (
 		<View className="bg-[rgb(51,51,51)]/[0.85] h-full w-full ">
-			<View className="flex flex-row items-center gap-x-6 top-8 left-10 mb-6">
+		<View style={{ flexDirection: 'row', alignItems: 'center', paddingTop: 16, paddingLeft: 24, paddingBottom: 8 }}>
 				<Text className="text-white text-2xl font-PoppinsMedium tracking-wider">Generate QR</Text>
 			</View>
-			<View className="flex-1 justify-center my-auto px-8 h-full mt-5">
+			<View style={{ flex: 1, paddingHorizontal: 24, marginTop: 8 }}>
 				<FlatList
 					data={iconsData}
 					keyExtractor={(item) => item.id.toString()}
 					numColumns={3}
 					columnWrapperStyle={{
-						justifyContent: 'space-between',
-						alignItems: 'stretch',
-						marginBottom: 50, // Spacing between rows
+						justifyContent: 'space-evenly',
+						alignItems: 'center',
+						marginBottom: 30,
 					}}
 					renderItem={({ item }) => (
-
 						<TouchableOpacity
-						
 							onPress={() => router.push({
-								pathname:'/(tabs)/qrform-page' as any,
-								params:{type:item.showName}
+								pathname: '/(tabs)/qrform-page' as any,
+								params: { type: item.showName },
 							})}
 							activeOpacity={0.7}
-
 							style={{
-								width: '25%', // Ensures proper spacing
-								aspectRatio: 1, // Makes the icon container square
+								width: 90,
+								height: 90,
 								justifyContent: 'center',
 								alignItems: 'center',
-								borderRadius: 10,
+								borderRadius: 12,
 								borderWidth: 1,
 								elevation: 3,
 								borderColor: 'white',
-								backgroundColor: '#333333', // Optional: Background for better visuals
+								backgroundColor: '#333333',
 							}}
 						>
-
-							{/* <View className='bg-[#F5F5F5] '> 
-
-								 
-							<Text className='text-[#333333]  '>
-								{item.showName}
-							</Text>
-							</View> */}
-
-							<View className='flex justify-center items-center'>
-
+							<View style={{ justifyContent: 'center', alignItems: 'center' }}>
 								<IconComponent name={item.name} type={item.type} size={item.size} color={item.color} />
-								<Text className='text-white text-sm  font-PoppinsRegular'>
+								<Text className='text-white text-sm font-PoppinsRegular' style={{ marginTop: 4 }}>
 									{item.showName}
 								</Text>
 							</View>
 						</TouchableOpacity>
 					)}
 					contentContainerStyle={{
-						paddingVertical: 30,
+						paddingTop: 16,
+						paddingBottom: 90, // clears the absolute-positioned tab bar (60px height + buffer)
 					}}
+					showsVerticalScrollIndicator={false}
 				/>
 			</View>
 		</View>

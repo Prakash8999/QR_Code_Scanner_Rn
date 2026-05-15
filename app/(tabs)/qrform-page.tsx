@@ -109,8 +109,7 @@ const QrForm: React.FC = () => {
           <Text className="text-white text-2xl font-PoppinsMedium tracking-wider">{type}</Text>
         </View>
 
-        <View className='flex justify-center items-center h-full w-full '>
-
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 60 }}>
           <SingleInputQrGenerator className="bg-black" {...qrProps} />
         </View>
       </View>
@@ -130,7 +129,7 @@ const QrForm: React.FC = () => {
           </Link>
           <Text className="text-white text-2xl font-PoppinsMedium tracking-wider">{type}</Text>
         </View>
-        <View className='flex justify-center items-center h-full w-full '>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 60 }}>
           <MultiInputComponent />
         </View>
       </View>

@@ -11,7 +11,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { StyleSheet } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { Alert } from 'react-native';
-import { saveGeneratedQrCode } from '@/hooks/SaveDataLocally';
+import { saveQRCodeWithId } from '@/hooks/SaveDataLocally';
 import { useQRStore } from '@/hooks/ZSDataStore';
 import { useRouter } from 'expo-router';
 import { parseQRCodeData, QRCodeDetails } from '@/helpers/RefractorQrData';
@@ -83,6 +83,9 @@ export const SingleInputQrGenerator: React.FC<SingleInputQrProps> = ({ className
 		// Save the data to Zustand
 		addData(JSON.stringify(preparedData));
 
+		// Save to history
+		await saveQRCodeWithId(preparedData);
+
 		// Navigate to the result page
 		router.push('/(tabs)/result-page');
 		setInputValue('')
@@ -147,6 +150,7 @@ export const WifiQrCompo: React.FC<{ className: string, type: string }> = ({ cla
 	const [securityType, setSecurityType] = useState('WPA/WPA2')
 	const router = useRouter()
 	const addData = useQRStore((state) => state.setQRData)
+	const [showHint, setShowHint] = useState(true);
 
 	const handleSaveQRCode = async () => {
 
@@ -197,6 +201,9 @@ export const WifiQrCompo: React.FC<{ className: string, type: string }> = ({ cla
 		// Save the data to Zustand or your state management
 		addData(JSON.stringify(preparedData));
 
+		// Save to history
+		await saveQRCodeWithId(preparedData);
+
 		// Navigate to the result page
 		router.push('/(tabs)/result-page');
 
@@ -208,90 +215,115 @@ export const WifiQrCompo: React.FC<{ className: string, type: string }> = ({ cla
 	};
 	console.log(securityType)
 	return (
-		<View className={`h-[70%] w-[80%] bg-[#333333] ${className}`} style={{ borderRadius: 20, borderBottomWidth: 2, borderTopWidth: 2, borderColor: '#FDB623' }}>
-			<View className="flex justify-center gap-y-8 pb-4 items-center h-full">
-				<WifiSymbol name="wifi" size={60} color="#FDB623" />
-				<View className='flex w-full gap-y-6'>
-					<View className='flex '>
-
-						<Text className='text-white  font-PoppinsMedium pl-4'>
-							SSID
-						</Text>
-						<TextInput
-							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
-							placeholder="Enter Network Name"
-							placeholderTextColor="gray"
-							value={network}
-							onChangeText={setNetwork}
-						/>
+		<View style={{ width: '90%', maxHeight: '85%', position: 'relative' }}>
+			<ScrollView
+				className={`bg-[#333333] ${className}`}
+				style={{ borderRadius: 20, borderBottomWidth: 2, borderTopWidth: 2, borderColor: '#FDB623' }}
+				contentContainerStyle={{ paddingBottom: 50, paddingTop: 16 }}
+				showsVerticalScrollIndicator={false}
+				scrollEventThrottle={16}
+				onScroll={({ nativeEvent }) => {
+					const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+					setShowHint(layoutMeasurement.height + contentOffset.y < contentSize.height - 10);
+				}}
+			>
+				<View className="flex justify-center gap-y-8 pb-4 items-center">
+					<WifiSymbol name="wifi" size={60} color="#FDB623" />
+					<View className='flex w-full gap-y-6'>
+						<View className='flex '>
+							<Text className='text-white font-PoppinsMedium pl-4'>
+								SSID
+							</Text>
+							<TextInput
+								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
+								placeholder="Enter Network Name"
+								placeholderTextColor="gray"
+								value={network}
+								onChangeText={setNetwork}
+							/>
+						</View>
+						<View>
+							<Text className='text-white font-PoppinsMedium pl-4'>
+								Password
+							</Text>
+							<TextInput
+								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
+								placeholder="Enter Password"
+								placeholderTextColor="gray"
+								value={password}
+								onChangeText={setPassword}
+							/>
+						</View>
+						<View className='flex flex-row items-center pl-4'>
+							<TouchableOpacity
+								style={{
+									height: 20,
+									width: 20,
+									borderWidth: 1,
+									borderColor: 'gray',
+									backgroundColor: 'white',
+									marginRight: 10,
+									justifyContent: 'center',
+									alignItems: 'center',
+								}}
+								onPress={() => setHidden(!hidden)}
+							>
+								{hidden && (
+									<Text style={{ color: 'black', fontWeight: 'bold' }}>✔</Text>
+								)}
+							</TouchableOpacity>
+							<Text style={{ color: 'white' }}>Hidden</Text>
+						</View>
+						<View>
+							<Text className="text-white font-PoppinsMedium pl-4">
+								Security Type
+							</Text>
+							<Picker
+								selectedValue={securityType}
+								style={{
+									color: 'white',
+									backgroundColor: '#333333',
+									width: '90%',
+									alignSelf: 'center',
+									borderWidth: 1,
+									borderColor: 'white',
+									borderRadius: 10,
+								}}
+								focusable
+								onValueChange={(itemValue) => setSecurityType(itemValue)}
+							>
+								<Picker.Item label="WPA/WPA2" value="WPA/WPA2" />
+								<Picker.Item label="WEP" value="WEP" />
+								<Picker.Item label="None" value="None" />
+							</Picker>
+						</View>
 					</View>
-					<View>
-
-						<Text className='text-white  font-PoppinsMedium pl-4'>
-							Password
-						</Text>
-						<TextInput
-							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
-							placeholder="Enter Password"
-							placeholderTextColor="gray"
-							value={password}
-							onChangeText={setPassword}
-						/>
-					</View>
-					<View
-						className='flex flex-row items-center pl-4'>
-						<TouchableOpacity
-							style={{
-								height: 20,
-								width: 20,
-								borderWidth: 1,
-								borderColor: "gray",
-								backgroundColor: "white",
-								marginRight: 10,
-								justifyContent: "center",
-								alignItems: "center",
-							}}
-							onPress={() => setHidden(!hidden)} // Toggle hidden state
-						>
-							{hidden && (
-								<Text style={{ color: "black", fontWeight: "bold" }}>✔</Text>
-							)}
-						</TouchableOpacity>
-						<Text style={{ color: "white" }}>Hidden</Text>
-					</View>
-					<View>
-						<Text className="text-white font-PoppinsMedium pl-4">
-							Security Type
-						</Text>
-						<Picker
-							selectedValue={securityType}
-
-							style={{
-								color: 'white',
-								backgroundColor: '#333333',
-								width: '90%',
-								alignSelf: 'center',
-								borderWidth: 1,
-								borderColor: 'white',
-								borderRadius: 10,
-							}}
-							focusable
-							onValueChange={(itemValue) => setSecurityType(itemValue)}
-						>
-
-
-
-							<Picker.Item label="WPA/WPA2" value="WPA/WPA2" />
-							<Picker.Item label="WEP" value="WEP" />
-							<Picker.Item label="None" value="None" />
-						</Picker>
-					</View>
-					{/* </View> */}
+					<TouchableOpacity className="bg-[#FDB623] rounded-md px-2 py-3" onPress={handleSaveQRCode}>
+						<Text className="text-xl font-PoppinsMedium">Generate WiFi QR</Text>
+					</TouchableOpacity>
 				</View>
-				<TouchableOpacity className="bg-[#FDB623] rounded-md px-2 py-3" onPress={handleSaveQRCode}>
-					<Text className="text-xl font-PoppinsMedium">Generate WiFi QR</Text>
-				</TouchableOpacity>
-			</View>
+			</ScrollView>
+			{showHint && (
+				<View
+					pointerEvents="none"
+					style={{
+						position: 'absolute',
+						bottom: 0,
+						left: 0,
+						right: 0,
+						height: 56,
+						borderBottomLeftRadius: 20,
+						borderBottomRightRadius: 20,
+						backgroundColor: 'rgba(51,51,51,0.88)',
+						justifyContent: 'center',
+						alignItems: 'center',
+						gap: 2,
+					}}
+				>
+					<MaterialIcon name="keyboard-arrow-down" size={22} color="#FDB623" />
+					<Text style={{ color: '#FDB623', fontSize: 10, fontFamily: 'Poppins-Regular', opacity: 0.85 }}>scroll for more</Text>
+				</View>
+			)}
 		</View>
 	);
 };
@@ -313,10 +345,11 @@ export const EventQrCompo: React.FC<{ className: string; type: string }> = ({ cl
 
 	const router = useRouter();
 	const addData = useQRStore((state) => state.setQRData);
+	const [showHint, setShowHint] = useState(true);
 
 
 
-	const handleSaveQRCode = () => {
+	const handleSaveQRCode = async () => {
 		if (!eventName.trim()) {
 			ToastAndroid.show('Event name is required.', ToastAndroid.SHORT);
 			return;
@@ -377,124 +410,153 @@ END:VEVENT`.trim()
 
 		console.log('Prepared Data:', preparedData);
 		addData(JSON.stringify(preparedData));
+
+		// Save to history
+		await saveQRCodeWithId(preparedData);
+
 		router.push('/(tabs)/result-page');
 	};
 
 	return (
-		<ScrollView
-			className={`h-[70%] w-[80%] bg-[#333333] ${className}`}
-			style={{
-				borderRadius: 20,
-				borderBottomWidth: 2,
-				borderTopWidth: 2,
-				borderColor: '#FDB623',
-			}}
-		>
-			<View className="flex justify-center  items-center h-full">
-				<MaterialIcon name="event-available" size={60} color="#FDB623" />
-				<View className="w-full flex gap-y-2">
-					<Text className="text-white font-PoppinsMediums pl-4">Event Name</Text>
-					<TextInput
-						className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
-						placeholder="Event Name"
-						placeholderTextColor="gray"
-						value={eventName}
-						onChangeText={setEventName}
-					/>
-					<Text className="text-white font-PoppinsMediums pl-4">Start Date</Text>
-					<TouchableOpacity
-						onPress={() => setShowPicker((prev) => ({ ...prev, startDate: true }))}
-						className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4 py-3"
-					>
-						<Text className="text-white">{startDate ? startDate.toDateString() : 'Select Start Date'}</Text>
-					</TouchableOpacity>
-					{showPicker.startDate && (
-						<DateTimePicker
-							value={startDate || new Date()}
-							mode="date"
-							display="default"
-							onChange={(event, date) => {
-								setShowPicker((prev) => ({ ...prev, startDate: false }));
-								if (date) setStartDate(date);
-							}}
+		<View style={{ width: '90%', maxHeight: '85%', position: 'relative' }}>
+			<ScrollView
+				className={`bg-[#333333] ${className}`}
+				style={{ borderRadius: 20, borderBottomWidth: 2, borderTopWidth: 2, borderColor: '#FDB623' }}
+				contentContainerStyle={{ paddingBottom: 50, paddingTop: 16 }}
+				showsVerticalScrollIndicator={false}
+				scrollEventThrottle={16}
+				onScroll={({ nativeEvent }) => {
+					const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+					setShowHint(layoutMeasurement.height + contentOffset.y < contentSize.height - 10);
+				}}
+			>
+				<View className="flex justify-center items-center">
+					<MaterialIcon name="event-available" size={60} color="#FDB623" />
+					<View className="w-full flex gap-y-2">
+						<Text className="text-white font-PoppinsMediums pl-4">Event Name</Text>
+						<TextInput
+							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
+							placeholder="Event Name"
+							placeholderTextColor="gray"
+							value={eventName}
+							onChangeText={setEventName}
 						/>
-					)}
-					<Text className="text-white font-PoppinsMediums pl-4">Start Time</Text>
-					<TouchableOpacity
-						onPress={() => setShowPicker((prev) => ({ ...prev, startTime: true }))}
-						className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4 py-3"
-					>
-						<Text className="text-white">{startTime ? startTime.toLocaleTimeString() : 'Select Start Time'}</Text>
-					</TouchableOpacity>
-					{showPicker.startTime && (
-						<DateTimePicker
-							value={startTime || new Date()}
-							mode="time"
-							display="default"
-							onChange={(event, time) => {
-								setShowPicker((prev) => ({ ...prev, startTime: false }));
-								if (time) setStartTime(time);
-							}}
+						<Text className="text-white font-PoppinsMediums pl-4">Start Date</Text>
+						<TouchableOpacity
+							onPress={() => setShowPicker((prev) => ({ ...prev, startDate: true }))}
+							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4 py-3"
+						>
+							<Text className="text-white">{startDate ? startDate.toDateString() : 'Select Start Date'}</Text>
+						</TouchableOpacity>
+						{showPicker.startDate && (
+							<DateTimePicker
+								value={startDate || new Date()}
+								mode="date"
+								display="default"
+								onChange={(event, date) => {
+									setShowPicker((prev) => ({ ...prev, startDate: false }));
+									if (date) setStartDate(date);
+								}}
+							/>
+						)}
+						<Text className="text-white font-PoppinsMediums pl-4">Start Time</Text>
+						<TouchableOpacity
+							onPress={() => setShowPicker((prev) => ({ ...prev, startTime: true }))}
+							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4 py-3"
+						>
+							<Text className="text-white">{startTime ? startTime.toLocaleTimeString() : 'Select Start Time'}</Text>
+						</TouchableOpacity>
+						{showPicker.startTime && (
+							<DateTimePicker
+								value={startTime || new Date()}
+								mode="time"
+								display="default"
+								onChange={(event, time) => {
+									setShowPicker((prev) => ({ ...prev, startTime: false }));
+									if (time) setStartTime(time);
+								}}
+							/>
+						)}
+						<Text className="text-white font-PoppinsMediums pl-4">End Date</Text>
+						<TouchableOpacity
+							onPress={() => setShowPicker((prev) => ({ ...prev, endDate: true }))}
+							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4 py-3"
+						>
+							<Text className="text-white">{endDate ? endDate.toDateString() : 'Select End Date'}</Text>
+						</TouchableOpacity>
+						{showPicker.endDate && (
+							<DateTimePicker
+								value={endDate || new Date()}
+								mode="date"
+								display="default"
+								onChange={(event, date) => {
+									setShowPicker((prev) => ({ ...prev, endDate: false }));
+									if (date) setEndDate(date);
+								}}
+							/>
+						)}
+						<Text className="text-white font-PoppinsMediums pl-4">End Time</Text>
+						<TouchableOpacity
+							onPress={() => setShowPicker((prev) => ({ ...prev, endTime: true }))}
+							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4 py-3"
+						>
+							<Text className="text-white">{endTime ? endTime.toLocaleTimeString() : 'Select End Time'}</Text>
+						</TouchableOpacity>
+						{showPicker.endTime && (
+							<DateTimePicker
+								value={endTime || new Date()}
+								mode="time"
+								display="default"
+								onChange={(event, time) => {
+									setShowPicker((prev) => ({ ...prev, endTime: false }));
+									if (time) setEndTime(time);
+								}}
+							/>
+						)}
+						<Text className="text-white font-PoppinsMediums pl-4">Event Location</Text>
+						<TextInput
+							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
+							placeholder="Enter Location"
+							placeholderTextColor="gray"
+							value={eventLocation}
+							onChangeText={setEventLocation}
 						/>
-					)}
-					<Text className="text-white font-PoppinsMediums pl-4">End Date</Text>
-					<TouchableOpacity
-						onPress={() => setShowPicker((prev) => ({ ...prev, endDate: true }))}
-						className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4 py-3"
-					>
-						<Text className="text-white">{endDate ? endDate.toDateString() : 'Select End Date'}</Text>
-					</TouchableOpacity>
-					{showPicker.endDate && (
-						<DateTimePicker
-							value={endDate || new Date()}
-							mode="date"
-							display="default"
-							onChange={(event, date) => {
-								setShowPicker((prev) => ({ ...prev, endDate: false }));
-								if (date) setEndDate(date);
-							}}
+						<Text className="text-white font-PoppinsMediums pl-4">Description</Text>
+						<TextInput
+							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
+							placeholder="Event details"
+							placeholderTextColor="gray"
+							value={description}
+							onChangeText={setDescription}
 						/>
-					)}
-					<Text className="text-white font-PoppinsMediums pl-4">End Time</Text>
-					<TouchableOpacity
-						onPress={() => setShowPicker((prev) => ({ ...prev, endTime: true }))}
-						className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4 py-3"
-					>
-						<Text className="text-white">{endTime ? endTime.toLocaleTimeString() : 'Select End Time'}</Text>
+					</View>
+					<TouchableOpacity className="bg-[#FDB623] rounded-md px-2 py-3" onPress={handleSaveQRCode}>
+						<Text className="text-xl font-PoppinsMedium">Generate Event QR</Text>
 					</TouchableOpacity>
-					{showPicker.endTime && (
-						<DateTimePicker
-							value={endTime || new Date()}
-							mode="time"
-							display="default"
-							onChange={(event, time) => {
-								setShowPicker((prev) => ({ ...prev, endTime: false }));
-								if (time) setEndTime(time);
-							}}
-						/>
-					)}
-					<Text className="text-white font-PoppinsMediums pl-4">Event Location</Text>
-					<TextInput
-						className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
-						placeholder="Enter Location"
-						placeholderTextColor="gray"
-						value={eventLocation}
-						onChangeText={setEventLocation}
-					/>
-					<Text className="text-white font-PoppinsMediums pl-4">Description</Text>
-					<TextInput
-						className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
-						placeholder="Event details"
-						placeholderTextColor="gray"
-						value={description}
-						onChangeText={setDescription}
-					/>
 				</View>
-				<TouchableOpacity className="bg-[#FDB623] rounded-md px-2 py-3" onPress={handleSaveQRCode}>
-					<Text className="text-xl font-PoppinsMedium">Generate Event QR</Text>
-				</TouchableOpacity>
-			</View>
-		</ScrollView>
+			</ScrollView>
+			{showHint && (
+				<View
+					pointerEvents="none"
+					style={{
+						position: 'absolute',
+						bottom: 0,
+						left: 0,
+						right: 0,
+						height: 56,
+						borderBottomLeftRadius: 20,
+						borderBottomRightRadius: 20,
+						backgroundColor: 'rgba(51,51,51,0.88)',
+						justifyContent: 'center',
+						alignItems: 'center',
+						gap: 2,
+					}}
+				>
+					<MaterialIcon name="keyboard-arrow-down" size={22} color="#FDB623" />
+					<Text style={{ color: '#FDB623', fontSize: 10, fontFamily: 'Poppins-Regular', opacity: 0.85 }}>scroll for more</Text>
+				</View>
+			)}
+		</View>
 	);
 };
 
@@ -514,12 +576,13 @@ export const ContactQrCompo: React.FC<{ className: string, type: string }> = ({ 
 	});
 	const router = useRouter();
 	const addData = useQRStore((state) => state.setQRData);
+	const [showHint, setShowHint] = useState(true);
 
 
 	const updateField = (field: string, value: string) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
-	const handleSaveQRCode = () => {
+	const handleSaveQRCode = async() => {
 		const {
 			firstName,
 			lastName,
@@ -585,11 +648,26 @@ export const ContactQrCompo: React.FC<{ className: string, type: string }> = ({ 
 		// Example save operation (using a state or sending to a server)
 		// Replace with your actual save logic
 		addData(JSON.stringify(qrData)); // Assuming addData is a function from your Zustand store or similar state management
+		
+		// Save to history
+		await saveQRCodeWithId(qrData);
+
 		router.push('/(tabs)/result-page');
 	};
 	return (
-		<View className={`h-[85%] w-[90%] bg-[#333333] ${className}`} style={{ borderRadius: 20, borderBottomWidth: 2, borderTopWidth: 2, borderColor: '#FDB623' }}>
-			<View className="flex  gap-y-5 items-center h-full">
+		<View style={{ width: '90%', maxHeight: '85%', position: 'relative' }}>
+			<ScrollView
+				className={`bg-[#333333] ${className}`}
+				style={{ borderRadius: 20, borderBottomWidth: 2, borderTopWidth: 2, borderColor: '#FDB623' }}
+				contentContainerStyle={{ paddingBottom: 50 }}
+				showsVerticalScrollIndicator={false}
+				scrollEventThrottle={16}
+				onScroll={({ nativeEvent }) => {
+					const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+					setShowHint(layoutMeasurement.height + contentOffset.y < contentSize.height - 10);
+				}}
+			>
+				<View className="flex gap-y-5 items-center">
 				<MaterialIcon name="perm-contact-cal" size={60} color="#FDB623" />
 
 
@@ -750,6 +828,28 @@ export const ContactQrCompo: React.FC<{ className: string, type: string }> = ({ 
 					<Text className="text-xl font-PoppinsMedium">Generate Contact QR</Text>
 				</TouchableOpacity>
 			</View>
+			</ScrollView>
+			{showHint && (
+				<View
+					pointerEvents="none"
+					style={{
+						position: 'absolute',
+						bottom: 0,
+						left: 0,
+						right: 0,
+						height: 56,
+						borderBottomLeftRadius: 20,
+						borderBottomRightRadius: 20,
+						backgroundColor: 'rgba(51,51,51,0.88)',
+						justifyContent: 'center',
+						alignItems: 'center',
+						gap: 2,
+					}}
+				>
+					<MaterialIcon name="keyboard-arrow-down" size={22} color="#FDB623" />
+					<Text style={{ color: '#FDB623', fontSize: 10, fontFamily: 'Poppins-Regular', opacity: 0.85 }}>scroll for more</Text>
+				</View>
+			)}
 		</View>
 	);
 };
@@ -769,11 +869,12 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 
 	const router = useRouter();
 	const addData = useQRStore((state) => state.setQRData);
+	const [showHint, setShowHint] = useState(true);
 
 	const updateField = (field: string, value: string) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
-	const handleSaveQRCode = () => {
+	const handleSaveQRCode =async () => {
 		// Validate required fields
 		if (!formData.companyName || !formData.phone) {
 			alert("Company Name and Phone are required!");
@@ -815,6 +916,10 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 		// Example save operation (using a state or sending to a server)
 		// Replace with your actual save logic
 		addData(JSON.stringify(qrData)); // Assuming addData is a function from your Zustand store or similar state management
+
+		// Save to history
+		await saveQRCodeWithId(qrData);
+
 		router.push('/(tabs)/result-page');
 
 
@@ -838,8 +943,19 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 
 	console.log(formData.companyName)
 	return (
-		<View className={`h-[85%] w-[90%] bg-[#333333] ${className}`} style={{ borderRadius: 20, borderBottomWidth: 2, borderTopWidth: 2, borderColor: '#FDB623' }}>
-			<View className="flex  gap-y-5 items-center h-full">
+		<View style={{ width: '90%', maxHeight: '85%', position: 'relative' }}>
+			<ScrollView
+				className={`bg-[#333333] ${className}`}
+				style={{ borderRadius: 20, borderBottomWidth: 2, borderTopWidth: 2, borderColor: '#FDB623' }}
+				contentContainerStyle={{ paddingBottom: 50 }}
+				showsVerticalScrollIndicator={false}
+				scrollEventThrottle={16}
+				onScroll={({ nativeEvent }) => {
+					const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+					setShowHint(layoutMeasurement.height + contentOffset.y < contentSize.height - 10);
+				}}
+			>
+				<View className="flex gap-y-5 items-center">
 				<MaterialIcon name="perm-contact-cal" size={60} color="#FDB623" />
 
 
@@ -974,6 +1090,28 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 					<Text className="text-xl font-PoppinsMedium">Generate Business QR</Text>
 				</TouchableOpacity>
 			</View>
+			</ScrollView>
+			{showHint && (
+				<View
+					pointerEvents="none"
+					style={{
+						position: 'absolute',
+						bottom: 0,
+						left: 0,
+						right: 0,
+						height: 56,
+						borderBottomLeftRadius: 20,
+						borderBottomRightRadius: 20,
+						backgroundColor: 'rgba(51,51,51,0.88)',
+						justifyContent: 'center',
+						alignItems: 'center',
+						gap: 2,
+					}}
+				>
+					<MaterialIcon name="keyboard-arrow-down" size={22} color="#FDB623" />
+					<Text style={{ color: '#FDB623', fontSize: 10, fontFamily: 'Poppins-Regular', opacity: 0.85 }}>scroll for more</Text>
+				</View>
+			)}
 		</View>
 	);
 };
@@ -995,8 +1133,9 @@ export const GeoLocationQrCompo: React.FC<{ className: string, type: string }> =
 
 	const router = useRouter();
 	const addData = useQRStore((state) => state.setQRData);
+	const [showHint, setShowHint] = useState(true);
 
-	const handleSaveQRCode = () => {
+	const handleSaveQRCode =async () => {
 		const { latitude, longitude, query } = formData;
 
 		if (!latitude || !longitude) {
@@ -1027,6 +1166,10 @@ export const GeoLocationQrCompo: React.FC<{ className: string, type: string }> =
 
 		}
 		addData(JSON.stringify(qrData)); // Assuming addData is a function from your Zustand store or similar state management
+		
+		// Save to history
+		await saveQRCodeWithId(qrData);
+
 		router.push('/(tabs)/result-page');
 
 
@@ -1043,61 +1186,85 @@ export const GeoLocationQrCompo: React.FC<{ className: string, type: string }> =
 	};
 
 	return (
-		<View className={`h-[85%] w-[90%] bg-[#333333] ${className}`} style={{ borderRadius: 20, borderBottomWidth: 2, borderTopWidth: 2, borderColor: '#FDB623' }}>
-			<View className="flex gap-y-5 items-center h-full">
-				<MaterialIcon name="location-on" size={60} color="#FDB623" />
+		<View style={{ width: '90%', maxHeight: '85%', position: 'relative' }}>
+			<ScrollView
+				className={`bg-[#333333] ${className}`}
+				style={{ borderRadius: 20, borderBottomWidth: 2, borderTopWidth: 2, borderColor: '#FDB623' }}
+				contentContainerStyle={{ paddingBottom: 50 }}
+				showsVerticalScrollIndicator={false}
+				scrollEventThrottle={16}
+				onScroll={({ nativeEvent }) => {
+					const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+					setShowHint(layoutMeasurement.height + contentOffset.y < contentSize.height - 10);
+				}}
+			>
+				<View className="flex gap-y-5 items-center">
+					<MaterialIcon name="location-on" size={60} color="#FDB623" />
 
-				<View className="flex gap-y-2">
-					<View className="flex gap-y-1">
-						<Text className="text-white font-PoppinsMediums pl-4">Latitude</Text>
-						<TextInput
-							className="text-white font-PoppinsRegular w-full border mx-auto border-gray-400 rounded-xl h-12 pl-4"
-							placeholder="Enter Latitude"
-							placeholderTextColor="gray"
-							keyboardType="numeric"
-							value={formData.latitude}
-							onChangeText={(text) => updateField('latitude', text)}
-						/>
+					<View className="flex gap-y-2">
+						<View className="flex gap-y-1">
+							<Text className="text-white font-PoppinsMediums pl-4">Latitude</Text>
+							<TextInput
+								className="text-white font-PoppinsRegular w-full border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								placeholder="Enter Latitude"
+								placeholderTextColor="gray"
+								keyboardType="numeric"
+								value={formData.latitude}
+								onChangeText={(text) => updateField('latitude', text)}
+							/>
+						</View>
+						<View className="flex gap-y-1">
+							<Text className="text-white font-PoppinsMediums pl-4">Longitude</Text>
+							<TextInput
+								className="text-white font-PoppinsRegular w-full border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								placeholder="Enter Longitude"
+								placeholderTextColor="gray"
+								keyboardType="numeric"
+								value={formData.longitude}
+								onChangeText={(text) => updateField('longitude', text)}
+							/>
+						</View>
+						<View className="flex gap-y-1">
+							<Text className="text-white font-PoppinsMediums pl-4">Query</Text>
+							<TextInput
+								className="text-white font-PoppinsRegular w-full border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								placeholder="Optional (e.g., Restaurant Name)"
+								placeholderTextColor="gray"
+								value={formData.query}
+								onChangeText={(text) => updateField('query', text)}
+							/>
+						</View>
 					</View>
 
-					<View className="flex gap-y-1">
-						<Text className="text-white font-PoppinsMediums pl-4">Longitude</Text>
-						<TextInput
-							className="text-white font-PoppinsRegular w-full border mx-auto border-gray-400 rounded-xl h-12 pl-4"
-							placeholder="Enter Longitude"
-							placeholderTextColor="gray"
-							keyboardType="numeric"
-							value={formData.longitude}
-							onChangeText={(text) => updateField('longitude', text)}
-						/>
-					</View>
-
-					<View className="flex gap-y-1">
-						<Text className="text-white font-PoppinsMediums pl-4">Query</Text>
-						<TextInput
-							className="text-white font-PoppinsRegular w-full border mx-auto border-gray-400 rounded-xl h-12 pl-4"
-							placeholder="Optional (e.g., Restaurant Name)"
-							placeholderTextColor="gray"
-							value={formData.query}
-							onChangeText={(text) => updateField('query', text)}
-						/>
-					</View>
+					<TouchableOpacity
+						className="bg-[#FDB623] rounded-md px-2 py-3"
+						onPress={handleSaveQRCode}
+					>
+						<Text className="text-xl font-PoppinsMedium">Generate Geo QR</Text>
+					</TouchableOpacity>
 				</View>
-
-				<TouchableOpacity
-					className="bg-[#FDB623] rounded-md px-2 py-3"
-					onPress={handleSaveQRCode}
+			</ScrollView>
+			{/* {showHint && (
+				<View
+					pointerEvents="none"
+					style={{
+						position: 'absolute',
+						bottom: 0,
+						left: 0,
+						right: 0,
+						height: 56,
+						borderBottomLeftRadius: 20,
+						borderBottomRightRadius: 20,
+						backgroundColor: 'rgba(51,51,51,0.88)',
+						justifyContent: 'center',
+						alignItems: 'center',
+						gap: 2,
+					}}
 				>
-					<Text className="text-xl font-PoppinsMedium">Generate Geo QR</Text>
-				</TouchableOpacity>
-
-				{qrContent && (
-					<View className="mt-5">
-						<QRCode value={qrContent} size={150} backgroundColor="#333333" color="#FDB623" />
-						<Text className="text-white mt-3">{qrContent}</Text>
-					</View>
-				)}
-			</View>
+					<MaterialIcon name="keyboard-arrow-down" size={22} color="#FDB623" />
+					<Text style={{ color: '#FDB623', fontSize: 10, fontFamily: 'Poppins-Regular', opacity: 0.85 }}>scroll for more</Text>
+				</View>
+			)} */}
 		</View>
 	);
 };
