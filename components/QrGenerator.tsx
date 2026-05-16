@@ -603,19 +603,17 @@ export const ContactQrCompo: React.FC<{ className: string, type: string }> = ({ 
 		}
 
 		// Prepare the contact details in a vCard-like format
-		const contactDetails = `
-		  BEGIN:VCARD
-		  VERSION:3.0
-		  N:${lastName};${firstName}
-		  FN:${firstName} ${lastName}
-		  ORG:${company}
-		  TITLE:${job}
-		  TEL:${phone}
-		  EMAIL:${email}
-		  URL:${website}
-		  ADR:;;${address};${city};;${country}
-		  END:VCARD
-		`;
+		const contactDetails = `BEGIN:VCARD
+VERSION:3.0
+N:${lastName};${firstName}
+FN:${firstName} ${lastName}
+ORG:${company}
+TITLE:${job}
+TEL:${phone}
+EMAIL:${email}
+URL:${website}
+ADR:;;${address};${city};;${country}
+END:VCARD`;
 
 		// Generate QR code payload
 		const qrData: QRCodeDetails = {

@@ -196,24 +196,48 @@ export const parseQRCodeData = (rawData: string): QRCodeDetails => {
 
   // Handle vCard QR Code
   if (data.startsWith("BEGIN:VCARD")) {
-    const vCardDetails: VCardDetails = {
-
-    };
+    const vCardDetails: Record<string, string> = {};
     const lines = data.split("\n");
 
     lines.forEach((line) => {
-      if (line.startsWith("N;")) {
-        vCardDetails.name = line.split(":")[1] || "Unknown";
-      } else if (line.startsWith("FN;")) {
-        vCardDetails.fullName = line.split(":")[1] || "Unknown";
-      } else if (line.startsWith("TEL;CELL")) {
-        vCardDetails.mobile = line.split(":")[1] || "Unknown";
-      } else if (line.startsWith("TEL;HOME;VOICE")) {
-        vCardDetails.homePhone = line.split(":")[1] || "Unknown";
-      } else if (line.startsWith("EMAIL:")) {
-        vCardDetails.email = line.split(":")[1] || "Unknown";
-      } else if (line.startsWith("URL:")) {
-        vCardDetails.url = line.split(":")[1] || "Unknown";
+      const trimmed = line.trim();
+      // Simple field: KEY:value
+      if (trimmed.startsWith("FN:")) {
+        vCardDetails.fullName = trimmed.slice(3).trim() || "Unknown";
+      } else if (trimmed.startsWith("N:")) {
+        vCardDetails.name = trimmed.slice(2).trim() || "Unknown";
+      } else if (trimmed.startsWith("TEL:")) {
+        vCardDetails.mobile = trimmed.slice(4).trim() || "Unknown";
+      } else if (trimmed.startsWith("TEL;")) {
+        // e.g. TEL;CELL:+1234 or TEL;HOME;VOICE:+1234
+        const colonIdx = trimmed.indexOf(":");
+        if (colonIdx !== -1) {
+          const val = trimmed.slice(colonIdx + 1).trim();
+          if (trimmed.includes("CELL")) {
+            vCardDetails.mobile = val || "Unknown";
+          } else if (trimmed.includes("HOME")) {
+            vCardDetails.homePhone = val || "Unknown";
+          } else {
+            vCardDetails.mobile = val || "Unknown";
+          }
+        }
+      } else if (trimmed.startsWith("EMAIL:") || trimmed.startsWith("EMAIL;")) {
+        const colonIdx = trimmed.indexOf(":");
+        vCardDetails.email = trimmed.slice(colonIdx + 1).trim() || "Unknown";
+      } else if (trimmed.startsWith("URL:") || trimmed.startsWith("URL;")) {
+        const colonIdx = trimmed.indexOf(":");
+        vCardDetails.url = trimmed.slice(colonIdx + 1).trim() || "Unknown";
+      } else if (trimmed.startsWith("ORG:")) {
+        vCardDetails.company = trimmed.slice(4).trim();
+      } else if (trimmed.startsWith("TITLE:")) {
+        vCardDetails.job = trimmed.slice(6).trim();
+      } else if (trimmed.startsWith("ADR:") || trimmed.startsWith("ADR;")) {
+        // ADR:;;street;city;;country
+        const colonIdx = trimmed.indexOf(":");
+        const adrParts = trimmed.slice(colonIdx + 1).split(";");
+        vCardDetails.address = adrParts[2]?.trim() || "";
+        vCardDetails.city = adrParts[3]?.trim() || "";
+        vCardDetails.country = adrParts[5]?.trim() || "";
       }
     });
     return {

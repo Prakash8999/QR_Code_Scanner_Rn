@@ -47,7 +47,7 @@
 
 import { Text, View } from 'react-native';
 import React from 'react';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, type RouteProp } from '@react-navigation/native';
 import { SingleInputQrGenerator, WifiQrCompo, BusinessQrCompo, EventQrCompo, ContactQrCompo, GeoLocationQrCompo } from '@/components/QrGenerator';
 import GoBackIcon from 'react-native-vector-icons/Ionicons';
 import { Link } from 'expo-router';
@@ -89,7 +89,7 @@ const multiInputComponents: Record<string, React.FC> = {
 };
 
 const QrForm: React.FC = () => {
-  const { params } = useRoute<{ params: { type: QrType } }>();
+  const { params } = useRoute<RouteProp<Record<string, { type: QrType }>>>();
   const { type } = params;
 
   console.log("type ", type)
