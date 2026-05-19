@@ -192,13 +192,22 @@ const ResultPage = () => {
 					</>
 				);
 		}
-		else {
-			return forCopy ? `Data: ${data.details.data}` : (
-				<Text className="text-white text-base" selectable={true}>{data.details.data}</Text>
+		else if (data.type === 'Twitter') {
+			return forCopy ? `Twitter: ${data.details.twitter}` : (
+				<Text className="text-white text-base" selectable={true}>Twitter: {data.details.twitter}</Text>
 			);
 		}
-	};
-
+		else if (data.type === 'Instagram') {
+			return forCopy ? `Instagram: ${data.details.instagram}` : (
+				<Text className="text-white text-base" selectable={true}>Instagram: {data.details.instagram}</Text>
+			);
+		}
+		else {
+			return forCopy ? `Data: ${data.details.data}` : (
+				<Text className="text-white text-base" selectable={true}>{data.details.data ? data.details.data : Object.entries(data.details).map(([k, v]) => `${k.replace(/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase())}: ${v}`).join('\n')}</Text>
+			);
+		}
+	}
 
 
 	return (
@@ -210,7 +219,7 @@ const ResultPage = () => {
 				<Text className="text-white text-2xl font-PoppinsMedium tracking-wider">Result</Text>
 			</View>
 
-			<View className="w-[85%] min-h-[30%] h-fit max-h-[60%] overflow-hidden bg-[#333333] mx-auto top-16 rounded-lg elevation-2xl p-6 flex gap-y-5">
+			<View className="w-[85%] min-h-[30%] h-fit max-h-[75%] overflow-hidden bg-[#333333] mx-auto top-16 rounded-lg elevation-2xl p-6 flex gap-y-5">
 				<View className="flex flex-row gap-x-6">
 					<QrSvg width="45" height="45" />
 					<View>
@@ -226,6 +235,9 @@ const ResultPage = () => {
 					}}
 				/>
 				<ScrollView showsVerticalScrollIndicator={false}>
+					<View className="flex gap-y-2 mb-4">
+						{renderData()}
+					</View>
 					<View className="flex items-center justify-center py-4">
 						{data.qrContent && (
 							<View 
@@ -240,9 +252,6 @@ const ResultPage = () => {
 								/>
 							</View>
 						)}
-					</View>
-					<View className="flex gap-y-2 mt-4">
-						{renderData()}
 					</View>
 				</ScrollView>
 			</View>

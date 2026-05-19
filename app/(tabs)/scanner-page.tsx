@@ -160,7 +160,9 @@ const ScannerPage = () => {
           style={{
             width: '96%',
             height: '100%',
-            top: 14
+            top: 14,
+            // borderRadius: 12,
+            // overflow: 'hidden'1
           }}
           // onBarcodeScanned={({ data }) => {
 
@@ -187,15 +189,12 @@ const ScannerPage = () => {
 
 
         <QrBody
-          width="90%" // Matches CameraView width
-          height="42%"
+          width="96%" // Matches CameraView width
+          height="100%" // Matches CameraView height
           style={{
-            position: 'absolute'
-
-            // backgroundColor:'white'
-
+            position: 'absolute',
+            top: 14 // Matches CameraView top
           }}
-
         />
 
 
