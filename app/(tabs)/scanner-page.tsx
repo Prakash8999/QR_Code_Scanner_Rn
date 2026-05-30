@@ -16,6 +16,7 @@ import {useQRStore} from '@/hooks/ZSDataStore';
 import { router } from 'expo-router';
 import { parseQRCodeData, QRCodeDetails } from '@/helpers/RefractorQrData';
 import {  saveQRCodeWithId } from '@/hooks/SaveDataLocally';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const debounce = (func: Function, delay: number) => {
   let timeoutId: ReturnType<typeof setTimeout>;
   return (...args: any[]) => {
@@ -56,6 +57,12 @@ const ScannerPage = () => {
       subs.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (permission?.granted) {
+      AsyncStorage.setItem('hasOpened', 'true').catch(console.log);
+    }
+  }, [permission?.granted]);
 
   const toggleFlashMode = () => {
     setFlashMode(!flashMode);
@@ -147,9 +154,9 @@ const ScannerPage = () => {
         <TouchableOpacity onPress={toggleFlashMode}>
           <Flash name="flash" size={30} color={`${flashMode ? '#FDB623' : 'white'}`} />
         </TouchableOpacity>
-        <Pressable onPress={handleImagePicker}>
+        {/* <Pressable onPress={handleImagePicker}>
           <FolderIcon name="images" size={30} color="white" />
-        </Pressable>
+        </Pressable> */}
         <Pressable onPress={switchCam}>
           <FolderIcon name="camera-reverse" size={30} color="white" />
         </Pressable>

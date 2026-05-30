@@ -211,15 +211,18 @@ const ResultPage = () => {
 
 
 	return (
-		<View className="bg-[rgb(51,51,51)]/[0.85] h-full w-full ">
-			<View className="flex flex-row items-center gap-x-6 top-8 left-10">
+		<View className="bg-[rgb(51,51,51)]/[0.85] h-full w-full flex flex-col justify-start">
+			<View className="flex flex-row items-center gap-x-6 mt-12 px-10">
 				<Link href={'/(tabs)/scanner-page'} className="p-1.5 bg-[#333333] rounded-lg">
 					<GoBackIcon name="chevron-back" size={30} color={'white'} />
 				</Link>
 				<Text className="text-white text-2xl font-PoppinsMedium tracking-wider">Result</Text>
 			</View>
 
-			<View className="w-[85%] min-h-[30%] h-fit max-h-[75%] overflow-hidden bg-[#333333] mx-auto top-16 rounded-lg elevation-2xl p-6 flex gap-y-5">
+			<View 
+				className="w-[85%] bg-[#333333] mx-auto mt-6 rounded-lg elevation-2xl p-6 flex gap-y-5 overflow-hidden"
+				style={{ maxHeight: '55%' }}
+			>
 				<View className="flex flex-row gap-x-6">
 					<QrSvg width="45" height="45" />
 					<View>
@@ -255,7 +258,7 @@ const ResultPage = () => {
 					</View>
 				</ScrollView>
 			</View>
-			<View className='top-20 p-6 w-[90%]  h-fit  mx-auto flex flex-row justify-between'>
+			<View className='mt-8 px-6 w-[90%] mx-auto flex flex-row justify-between items-center'>
 				{data.type === 'Url' ? (
 
 					<OpenURLButton url={data.details.url.toLowerCase()} text='Open Url' iconName='external-link' />
