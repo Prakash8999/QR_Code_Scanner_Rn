@@ -114,6 +114,7 @@ export const SingleInputQrGenerator: React.FC<SingleInputQrProps> = ({ className
 					} */}
 					<TextInput
 						className={`text-white font-PoppinsRegular  w-[90%] border mx-auto border-gray-400 rounded-xl pl-2  ${type === 'Text' ? 'h-[50%]' : 'h-12'} `}
+						style={{ paddingVertical: 0 }}
 						placeholderTextColor={'gray'}
 						onChangeText={setInputValue}
 						value={inputValue}
@@ -236,6 +237,7 @@ export const WifiQrCompo: React.FC<{ className: string, type: string }> = ({ cla
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Network Name"
 								placeholderTextColor="gray"
 								value={network}
@@ -248,6 +250,7 @@ export const WifiQrCompo: React.FC<{ className: string, type: string }> = ({ cla
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Password"
 								placeholderTextColor="gray"
 								value={password}
@@ -436,6 +439,7 @@ END:VEVENT`.trim()
 						<Text className="text-white font-PoppinsMediums pl-4">Event Name</Text>
 						<TextInput
 							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
+							style={{ paddingVertical: 0 }}
 							placeholder="Event Name"
 							placeholderTextColor="gray"
 							value={eventName}
@@ -516,6 +520,7 @@ END:VEVENT`.trim()
 						<Text className="text-white font-PoppinsMediums pl-4">Event Location</Text>
 						<TextInput
 							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
+							style={{ paddingVertical: 0 }}
 							placeholder="Enter Location"
 							placeholderTextColor="gray"
 							value={eventLocation}
@@ -524,6 +529,7 @@ END:VEVENT`.trim()
 						<Text className="text-white font-PoppinsMediums pl-4">Description</Text>
 						<TextInput
 							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl pl-4"
+							style={{ paddingVertical: 0 }}
 							placeholder="Event details"
 							placeholderTextColor="gray"
 							value={description}
@@ -678,6 +684,7 @@ END:VCARD`;
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Name"
 								placeholderTextColor="gray"
 								value={formData.firstName}
@@ -690,6 +697,7 @@ END:VCARD`;
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Name"
 								placeholderTextColor="gray"
 								value={formData.lastName}
@@ -704,6 +712,7 @@ END:VCARD`;
 								Company						</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Company"
 								placeholderTextColor="gray"
 								value={formData.company}
@@ -716,6 +725,7 @@ END:VCARD`;
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Job"
 								placeholderTextColor="gray"
 								value={formData.job}
@@ -731,6 +741,7 @@ END:VCARD`;
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Phone"
 								placeholderTextColor="gray"
 								keyboardType='number-pad'
@@ -744,6 +755,7 @@ END:VCARD`;
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Email"
 								placeholderTextColor="gray"
 								keyboardType='email-address'
@@ -763,6 +775,7 @@ END:VCARD`;
 						</Text>
 						<TextInput
 							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+							style={{ paddingVertical: 0 }}
 							placeholder="Enter Website"
 							placeholderTextColor="gray"
 							value={formData.website}
@@ -776,6 +789,7 @@ END:VCARD`;
 						</Text>
 						<TextInput
 							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+							style={{ paddingVertical: 0 }}
 							placeholder="Enter Address"
 							placeholderTextColor="gray"
 							value={formData.address}
@@ -792,6 +806,7 @@ END:VCARD`;
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter City"
 								placeholderTextColor="gray"
 								value={formData.city}
@@ -804,6 +819,7 @@ END:VCARD`;
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Country"
 								placeholderTextColor="gray"
 								value={formData.country}
@@ -966,6 +982,7 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 						</Text>
 						<TextInput
 							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+							style={{ paddingVertical: 0 }}
 							placeholder="Enter Name"
 							placeholderTextColor="gray"
 							value={formData.companyName}
@@ -978,6 +995,7 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 						</Text>
 						<TextInput
 							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+							style={{ paddingVertical: 0 }}
 							placeholder="e.g Food/Agency"
 							placeholderTextColor="gray"
 							value={formData.industry}
@@ -993,6 +1011,7 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Phone"
 								placeholderTextColor="gray"
 								keyboardType='number-pad'
@@ -1006,6 +1025,7 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Email"
 								keyboardType='email-address'
 								placeholderTextColor="gray"
@@ -1025,6 +1045,7 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 						</Text>
 						<TextInput
 							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+							style={{ paddingVertical: 0 }}
 							placeholder="Enter Website"
 							placeholderTextColor="gray"
 							value={formData.website}
@@ -1038,6 +1059,7 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 						</Text>
 						<TextInput
 							className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+							style={{ paddingVertical: 0 }}
 							placeholder="Enter Address"
 							placeholderTextColor="gray"
 							value={formData.address}
@@ -1054,6 +1076,7 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter City"
 								placeholderTextColor="gray"
 								value={formData.city}
@@ -1066,6 +1089,7 @@ export const BusinessQrCompo: React.FC<{ className: string, type: string }> = ({
 							</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-[90%] border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Country"
 								placeholderTextColor="gray"
 								value={formData.country}
@@ -1204,6 +1228,7 @@ export const GeoLocationQrCompo: React.FC<{ className: string, type: string }> =
 							<Text className="text-white font-PoppinsMediums pl-4">Latitude</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-full border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Latitude"
 								placeholderTextColor="gray"
 								keyboardType="numeric"
@@ -1215,6 +1240,7 @@ export const GeoLocationQrCompo: React.FC<{ className: string, type: string }> =
 							<Text className="text-white font-PoppinsMediums pl-4">Longitude</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-full border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Enter Longitude"
 								placeholderTextColor="gray"
 								keyboardType="numeric"
@@ -1226,6 +1252,7 @@ export const GeoLocationQrCompo: React.FC<{ className: string, type: string }> =
 							<Text className="text-white font-PoppinsMediums pl-4">Query</Text>
 							<TextInput
 								className="text-white font-PoppinsRegular w-full border mx-auto border-gray-400 rounded-xl h-12 pl-4"
+								style={{ paddingVertical: 0 }}
 								placeholder="Optional (e.g., Restaurant Name)"
 								placeholderTextColor="gray"
 								value={formData.query}

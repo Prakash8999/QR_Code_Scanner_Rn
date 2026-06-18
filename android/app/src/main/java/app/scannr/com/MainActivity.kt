@@ -1,4 +1,4 @@
-package com.cipher_git.React_Native
+package app.scannr.com
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

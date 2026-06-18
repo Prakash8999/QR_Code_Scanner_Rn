@@ -1,4 +1,4 @@
-package com.cipher_git.React_Native
+package app.scannr.com
 
 import android.app.Application
 import android.content.res.Configuration

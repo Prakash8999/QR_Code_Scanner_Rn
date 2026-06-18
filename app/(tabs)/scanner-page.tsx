@@ -154,9 +154,9 @@ const ScannerPage = () => {
         <TouchableOpacity onPress={toggleFlashMode}>
           <Flash name="flash" size={30} color={`${flashMode ? '#FDB623' : 'white'}`} />
         </TouchableOpacity>
-        {/* <Pressable onPress={handleImagePicker}>
+        <Pressable onPress={handleImagePicker}>
           <FolderIcon name="images" size={30} color="white" />
-        </Pressable> */}
+        </Pressable>
         <Pressable onPress={switchCam}>
           <FolderIcon name="camera-reverse" size={30} color="white" />
         </Pressable>

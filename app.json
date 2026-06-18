@@ -2,7 +2,7 @@
   "expo": {
     "name": "Scannr",
     "slug": "Scannr",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "Scannr",
@@ -17,6 +17,7 @@
       "newArchEnabled": true
     },
     "android": {
+      "versionCode": 6,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#333333"
@@ -27,7 +28,7 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.cipher_git.React_Native",
+      "package": "app.scannr.com",
       "newArchEnabled": true
     },
     "web": {
