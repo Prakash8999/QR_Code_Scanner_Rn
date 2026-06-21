@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking, Alert, ToastAndroid, Share, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Linking, Alert, ToastAndroid, Share, Dimensions, Image } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import GoBackIcon from 'react-native-vector-icons/Ionicons';
 import { Link, Navigator, useNavigation } from 'expo-router';
@@ -242,7 +242,19 @@ const ResultPage = () => {
 						{renderData()}
 					</View>
 					<View className="flex items-center justify-center py-4">
-						{data.qrContent && (
+						{qrData.base64ImageUrl ? (
+							<View 
+								ref={viewShotRef} 
+								style={{ borderRadius: 15, overflow: 'hidden', elevation: 5 }}
+								className="items-center justify-center shadow-lg"
+							>
+								<Image 
+									source={{ uri: qrData.base64ImageUrl }} 
+									style={{ width: width * 0.7, height: width * 0.7 }} 
+									resizeMode="contain" 
+								/>
+							</View>
+						) : data.qrContent ? (
 							<View 
 								ref={viewShotRef} 
 								style={{ padding: 25, backgroundColor: 'white', borderRadius: 30, elevation: 5 }}
@@ -254,7 +266,7 @@ const ResultPage = () => {
 									getRef={(c) => (qrRef.current = c)}
 								/>
 							</View>
-						)}
+						) : null}
 					</View>
 				</ScrollView>
 			</View>

@@ -5,7 +5,7 @@ import FolderIcon from 'react-native-vector-icons/Ionicons';
 import * as FileSystem from 'expo-file-system/legacy';
 
 import { PanGestureHandler, PinchGestureHandler } from 'react-native-gesture-handler';
-import { CameraType, CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
+import { CameraType, CameraView, useCameraPermissions, BarcodeScanningResult, scanFromURLAsync } from 'expo-camera';
 import { QrBody } from '@/assets/images/SvgImage';
 import Slider from '@react-native-community/slider';
 import PlusMinus from 'react-native-vector-icons/AntDesign';
@@ -14,6 +14,7 @@ import ScannerOverlay from '@/components/SelectImage';
 
 import {useQRStore} from '@/hooks/ZSDataStore';
 import { router } from 'expo-router';
+import { useIsFocused } from '@react-navigation/native';
 import { parseQRCodeData, QRCodeDetails } from '@/helpers/RefractorQrData';
 import {  saveQRCodeWithId } from '@/hooks/SaveDataLocally';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -26,6 +27,7 @@ const debounce = (func: Function, delay: number) => {
 };
 const ScannerPage = () => {
   const [flashMode, setFlashMode] = useState(false);
+  const isFocused = useIsFocused();
   const [zoom, setZoom] = useState(0);
   const [image, setImage] = useState<string | null>('');
   const [scale, setScale] = React.useState(1);
@@ -77,20 +79,40 @@ const ScannerPage = () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
-      aspect: [4, 3],
       quality: 1,
-      // base64:true
-
     });
 
     console.log(result);
 
-    if (!result.canceled) {
-      // await   decodeQRCode(result?.assets[0]?.uri);
-
-      return setImage(result?.assets[0]?.uri);
-
-
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const uri = result.assets[0].uri;
+      setImage(uri);
+      
+      try {
+        const scannedResults = await scanFromURLAsync(uri, ["qr"]);
+        if (scannedResults && scannedResults.length > 0) {
+          const barcodeResult = scannedResults[0];
+          console.log("Scanned from image: ", barcodeResult.data);
+          
+          if (isScanning) return;
+          setIsScanning(true); 
+          
+          const raw = barcodeResult.data;
+          const parsedData = parseQRCodeData(raw);
+          addData(JSON.stringify(parsedData), uri, raw);
+          router.push('/(tabs)/result-page');
+          await saveQRCodeWithId(parsedData);
+          
+          setTimeout(() => {
+            setIsScanning(false);
+          }, 200);
+        } else {
+          Alert.alert("No QR Code Found", "We couldn't detect a QR code in the selected image.");
+        }
+      } catch (error) {
+        console.error("Error scanning image: ", error);
+        Alert.alert("Error", "Failed to scan the image. Ensure the image is clear.");
+      }
     }
   }
 
@@ -98,25 +120,6 @@ const ScannerPage = () => {
     debounce((value: number) => setZoom(value), 100), // Adjust debounce delay if needed
     []
   );
-
-  //   const decodeQRCode = async (imageUri: string) => {
-  //     console.log("object ", imageUri);
-  //     var qr = new QrcodeDecoder();
-
-  //       // let {result}  =await QrImageReader.decode({path:imageUri})
-
-  //       // console.log("qwertyui", imageUri)
-  //       // console.log("data ", result);
-  //     await  qr.decodeFromImage(imageUri).then((res) => {
-  //         console.log("res", res);
-  //       }).catch((err)=>{
-  // console.log("err", err)
-  //       });
-
-  //   };
-  
-
-
 
   // Define a handler function that processes the scan result
   const handleBarcodeScanned =async ({ type, data, raw, bounds, cornerPoints }: BarcodeScanningResult) => {
@@ -132,7 +135,7 @@ const ScannerPage = () => {
       };
       console.log("raw ", raw)
       const parsedData = parseQRCodeData(barcodeResult.raw!);
-      addData(JSON.stringify(parsedData))
+      addData(JSON.stringify(parsedData), "", barcodeResult.raw!)
       router.push('/(tabs)/result-page')
       await saveQRCodeWithId(parsedData );
       setTimeout( () => {
@@ -163,35 +166,29 @@ const ScannerPage = () => {
       </View>
 
       <View className="w-[85%] h-[42.2%] top-24 fle items-center relative ">
-        <CameraView
-          style={{
-            width: '96%',
-            height: '100%',
-            top: 14,
-            // borderRadius: 12,
-            // overflow: 'hidden'1
-          }}
-          // onBarcodeScanned={({ data }) => {
-
-          //   if (data) {
-          //     // qrLock.current = true;
-          //     setTimeout(async () => {
-          //       scanHandler(data)
-          //       // await Linking.openURL(data);
-
-          //     }, 500);
-          //     console.log("qr code", data);
-          //   }
-          // }}
-          facing={switchCamera}
-          flash='on'
-        
-          enableTorch={flashMode}
-          // autofocus='on'
-
-          zoom={zoom}
-          onBarcodeScanned={handleBarcodeScanned}
-        />
+        {isFocused ? (
+          <CameraView
+            style={{
+              width: '96%',
+              height: '100%',
+              top: 14,
+            }}
+            facing={switchCamera}
+            flash='on'
+            enableTorch={flashMode}
+            zoom={zoom}
+            onBarcodeScanned={handleBarcodeScanned}
+          />
+        ) : (
+          <View
+            style={{
+              width: '96%',
+              height: '100%',
+              top: 14,
+              backgroundColor: 'black'
+            }}
+          />
+        )}
 
 
 
